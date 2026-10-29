@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask PIE</title>
+<meta name="description" content="Marketing Intelligence Assistant: ask questions about GoodBooks ERP, answered from the PIE knowledge base in Qdrant.">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#dfe3e8; --text:#17202a; --muted:#5b6673;
+  --accent:#2457d6; --accent-soft:#e7eefc; --ok:#1f7a4d; --ok-soft:#e3f4ea; --warn:#9a5b00; --warn-soft:#fdf1dc;
+  --bad:#a33a2b; --bad-soft:#fbe7e3; --user:#2457d6; --user-text:#ffffff;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --radius:12px; --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+    --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+    --bad:#f08a78; --bad-soft:#3a1d18; --user:#3561d9; --user-text:#ffffff; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+  --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+  --bad:#f08a78; --bad-soft:#3a1d18; --user:#3561d9; --user-text:#ffffff; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.55 var(--font);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+button,input,select,textarea{font:inherit;color:inherit}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{background:var(--surface);border-bottom:1px solid var(--border);flex:none}
+.top-inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;margin-right:8px;min-width:0}
+.appnav{display:flex;gap:2px;flex-wrap:wrap;margin-right:auto}
+.appnav a{padding:6px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+.appnav a:hover{background:var(--surface-2);color:var(--text)}
+.appnav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+
+.brand b{font-size:16px}
+.brand span{color:var(--muted);font-size:12px}
+select{padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);max-width:180px}
+.btn{color:var(--text);border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 12px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-2)}
+.btn.small{padding:4px 9px;font-size:12px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+a.btn{color:var(--accent)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+label.inline{display:inline-flex;gap:6px;align-items:center;cursor:pointer;font-size:13px;color:var(--muted)}
+.chip.aud{background:var(--accent-soft);color:var(--accent);border-color:transparent;font-weight:600}
+.ctxline{display:inline-flex;gap:6px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted)}
+.kb{max-width:1100px;margin:0 auto;padding:0 16px 8px;color:var(--muted);font-size:12px;display:flex;gap:14px;flex-wrap:wrap}
+.kb b{color:var(--text);font-weight:600}
+.kb .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:5px;vertical-align:1px}
+.kb .dot.off{background:var(--bad)}
+
+/* sessions: sidebar + chat column */
+.app{flex:1;display:flex;min-height:0}
+.side{width:280px;flex:none;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:8px;padding:10px;min-height:0}
+.newchat{justify-content:center}
+.side input[type=search]{padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
+.side-list{flex:1;overflow:auto;margin:0 -4px;padding:0 4px}
+.side-group{font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:12px 6px 4px}
+.sitem{position:relative;display:block;width:100%;text-align:left;border:0;background:none;border-radius:8px;padding:7px 8px;cursor:pointer}
+.sitem:hover{background:var(--surface-2)}
+.sitem[aria-current="true"]{background:var(--accent-soft)}
+.sitem .t{display:block;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:58px}
+.sitem small{display:block;color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sitem .acts{position:absolute;right:4px;top:5px;display:none;gap:2px}
+.sitem:hover .acts,.sitem:focus-within .acts,.sitem[aria-current="true"] .acts{display:flex}
+.sitem .acts span{font-size:12px;padding:2px 5px;border-radius:5px;color:var(--muted);cursor:pointer}
+.sitem .acts span:hover{background:var(--surface);color:var(--text)}
+.side-empty{color:var(--muted);font-size:12.5px;padding:10px 6px}
+.side-foot{font-size:12px;padding:4px 2px}
+.chatcol{flex:1;display:flex;flex-direction:column;min-width:0}
+.chatbar{flex:none;border-bottom:1px solid var(--border);background:var(--surface)}
+.chatbar-inner{max-width:900px;margin:0 auto;padding:8px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chat-title{border:0;background:none;font-weight:650;font-size:15px;padding:2px 6px;margin-left:-6px;border-radius:6px;cursor:text;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-title:hover{background:var(--surface-2)}
+.side-toggle{display:none}
+@media (max-width:900px){
+  .side-toggle{display:inline-flex}
+  .side{position:fixed;left:0;top:0;bottom:0;z-index:25;transform:translateX(-105%);transition:transform .2s;box-shadow:4px 0 24px rgba(0,0,0,.18)}
+  .side.open{transform:none}
+}
+main{flex:1;overflow:auto}
+.thread{max-width:900px;margin:0 auto;padding:18px 16px 24px;display:flex;flex-direction:column;gap:16px}
+.empty{padding:28px 0 8px;text-align:center}
+.empty h1{font-size:22px;margin:0 0 6px}
+.empty p{color:var(--muted);margin:0 auto 18px;max-width:560px}
+.prompts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;text-align:left}
+.prompt{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;box-shadow:var(--shadow);text-align:left;width:100%}
+.prompt:hover{border-color:var(--accent)}
+.prompt small{display:block;color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+
+.msg{display:flex;flex-direction:column;gap:6px}
+.msg.user{align-items:flex-end}
+.bubble{background:var(--user);color:var(--user-text);padding:10px 14px;border-radius:14px 14px 4px 14px;max-width:min(680px,88%);white-space:pre-wrap;word-wrap:break-word}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;max-width:100%}
+.card-head{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.chip{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px}
+.badge.grounded{background:var(--ok-soft);color:var(--ok)}
+.badge.partial,.badge.unverified{background:var(--warn-soft);color:var(--warn)}
+.badge.not_found{background:var(--bad-soft);color:var(--bad)}
+.note{border-radius:8px;padding:8px 12px;font-size:13px;margin:10px 0 0;background:var(--warn-soft);color:var(--warn)}
+.note ul{margin:4px 0 0;padding-left:18px}
+
+.md{overflow-wrap:anywhere}
+.md h1,.md h2,.md h3,.md h4{margin:14px 0 6px;line-height:1.3}
+.md h1{font-size:18px}.md h2{font-size:16px}.md h3{font-size:15px}.md h4{font-size:14px}
+.md > :first-child{margin-top:0}
+.md p{margin:8px 0}
+.md ul,.md ol{margin:6px 0;padding-left:22px}
+.md li{margin:3px 0}
+.md code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.md pre{background:var(--surface-2);padding:10px;border-radius:8px;overflow:auto}
+.md pre code{background:none;padding:0}
+.md .tbl{overflow-x:auto;margin:8px 0}
+.md table{border-collapse:collapse;font-size:13px;min-width:100%}
+.md th,.md td{border:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+.md th{background:var(--surface-2)}
+.cite{display:inline-block;font-size:10.5px;font-weight:600;line-height:1;padding:3px 5px;margin:0 1px;border-radius:5px;background:var(--accent-soft);color:var(--accent);border:0;cursor:pointer;vertical-align:1px}
+.cite:hover{filter:brightness(.95)}
+
+details.sources{margin-top:12px;border-top:1px solid var(--border);padding-top:10px}
+details.sources summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
+.src{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:12.5px;transition:background .6s}
+.src.flash{background:var(--accent-soft)}
+.src .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.src .ref{font-weight:700;color:var(--accent)}
+.src .st{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px}
+.st.VERIFIED,.st.OBSERVED{background:var(--ok-soft);color:var(--ok)}
+.st.REVIEW,.st.AI{background:var(--warn-soft);color:var(--warn)}
+.src .txt{color:var(--muted);margin-top:4px}
+.src code{font-family:var(--mono);font-size:11.5px;word-break:break-all}
+.src .rel{font-size:11.5px;margin-left:auto;white-space:nowrap}
+
+/* "How PIE answered": the answer trace */
+details.trace{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+details.trace > summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
+.steps{list-style:none;margin:10px 0 0;padding:0;counter-reset:step}
+.steps > li{position:relative;padding:0 0 12px 30px;counter-increment:step}
+.steps > li::before{content:counter(step);position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.steps > li::after{content:"";position:absolute;left:9.5px;top:22px;bottom:2px;width:1px;background:var(--border)}
+.steps > li:last-child::after{display:none}
+.steps .sname{font-weight:650;text-transform:capitalize}
+.steps .ssum{color:var(--text);font-size:13px;margin:2px 0 4px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:3px 10px;font-size:12.5px;color:var(--muted)}
+.kv b{color:var(--text);font-weight:500}
+.q{display:inline-block;font-family:var(--mono);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin:2px 3px 2px 0}
+.ttable{overflow-x:auto;margin-top:6px}
+.ttable table{border-collapse:collapse;width:100%;font-size:12px}
+.ttable th,.ttable td{border-bottom:1px solid var(--border);padding:5px 6px;text-align:left;vertical-align:top}
+.ttable th{color:var(--muted);font-weight:600;background:var(--surface-2)}
+.ttable tr.dim td{color:var(--muted)}
+.ttable .num{text-align:right;font-variant-numeric:tabular-nums}
+.yes{color:var(--ok);font-weight:700}
+.trace pre{white-space:pre-wrap;word-break:break-word;background:var(--surface-2);border-radius:8px;padding:10px;font-size:11.5px;max-height:420px;overflow:auto}
+.trace h4{margin:14px 0 4px;font-size:13px}
+.card-foot{display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--muted);font-size:12px;flex-wrap:wrap}
+.card-foot .spacer{margin-left:auto}
+
+.loading{display:flex;gap:10px;align-items:center;color:var(--muted)}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.3;animation:blink 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.dots i{animation:none;opacity:.7}}
+.error{border-color:var(--bad)}
+.error .md{color:var(--bad)}
+
+footer.composer{flex:none;background:var(--surface);border-top:1px solid var(--border)}
+.composer-inner{max-width:900px;margin:0 auto;padding:10px 16px 12px}
+.suggest{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin}
+.suggest button{flex:none;font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer}
+.suggest button:hover{border-color:var(--accent);color:var(--accent)}
+.inputrow{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;resize:none;min-height:44px;max-height:180px;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);line-height:1.4}
+.hint{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:11.5px;margin-top:6px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+@media (max-width:640px){
+  .brand{flex-basis:100%}
+  .hide-sm{display:none}
+  .bubble{max-width:94%}
+}
+</style>
+<!--PIE_CHAT_CONFIG-->
+<script src="config.js"></script>
+<script src="modules.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><b>Ask PIE</b><span>Marketing Intelligence Assistant · answers from the PIE knowledge base</span></div>
+<nav class="appnav" id="appnav" aria-label="PIE pages"><a href="index.html">Home</a><a href="chat.html" aria-current="page">Ask PIE</a><a href="catalog.html">Feature Catalog</a><a href="fields.html">Field Explorer</a><a href="relations.html">Relationships</a><a href="logs.html">Activity Log</a><a href="intelligence.html">Department Knowledge</a></nav>
+    <div id="modules" aria-label="Limit answers to one or more modules"></div>
+    <label class="inline ctx" title="Who the answer is written for: it changes the style and level of detail, never the facts">For
+      <select id="audience" aria-label="Answer for"><option value="marketing">Marketing Team</option><option value="client">Client</option><option value="developer">Developer</option><option value="stakeholder">Stakeholder</option></select></label>
+    <select id="client-type" aria-label="Client type" hidden><option value="nontechnical">Non-technical client</option><option value="technical">Technical client</option></select>
+    <label class="inline" title="Also use knowledge that still needs product review"><input type="checkbox" id="include-review"> <span class="hide-sm">Include unconfirmed</span></label>
+    <button class="btn small side-toggle" id="side-toggle" type="button" aria-controls="side" aria-expanded="false">☰ Chats</button>
+    <button class="btn small" id="theme" type="button" aria-label="Toggle colour theme">◐</button>
+  </div>
+  <div class="kb" id="kb" aria-live="polite"><span>Connecting to the knowledge base…</span></div>
+</header>
+
+<div class="app">
+<aside class="side" id="side" aria-label="Chats">
+  <button class="btn primary newchat" id="new-chat" type="button">+ New chat</button>
+  <input type="search" id="chat-search" placeholder="Search chats…" aria-label="Search chats" autocomplete="off">
+  <div class="side-list" id="chat-list"></div>
+  <label class="inline side-foot"><input type="checkbox" id="show-archived"> Show archived chats</label>
+</aside>
+<div class="chatcol">
+<div class="chatbar"><div class="chatbar-inner">
+  <button class="chat-title" id="chat-title" type="button" title="Rename this chat">New chat</button>
+  <span id="chat-ctx"></span>
+</div></div>
+<main id="main">
+  <div class="thread" id="thread" aria-live="polite"></div>
+</main>
+
+<footer class="composer">
+  <div class="composer-inner">
+    <div class="suggest" id="suggest" aria-label="Suggested questions"></div>
+    <form class="inputrow" id="form">
+      <label class="sr-only" for="input">Your question</label>
+      <textarea id="input" rows="1" maxlength="2000" placeholder="Ask about features, industries, demos, differentiators, gaps or tickets…"></textarea>
+      <button class="btn primary" id="send" type="submit">Send</button>
+    </form>
+    <div class="hint"><span>Answers use only PIE knowledge and cite it. Check ⚠ items with product before external use.</span><span id="count">0/2000</span></div>
+  </div>
+</footer>
+</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+  const SUGGESTIONS = [
+    ["Feature discovery", "Give me the feature list of the modules."],
+    ["Industry targeting", "What features should I highlight for the pump industry?"],
+    ["Demo preparation", "Prepare a demo flow for a pump industry's IT Manager."],
+    ["Differentiation", "What are our key product differentiators?"],
+    ["Market gaps", "What product features are missing or in demand?"],
+    ["Ticket analysis", "What are the top issues reported in our software?"],
+    ["Feature discovery", "What are the key features available in the Inventory module?"],
+    ["Industry targeting", "What business problems can our ERP solve for the pump industry?"],
+    ["Content creation", "Write a brochure page for the Inventory module."],
+    ["How-to", "How do I create a Bill of Materials?"],
+    ["Business process", "Explain the end-to-end process from gate entry to stock."],
+    ["Developer", "Where is the BOM validated before saving, and which line throws the error?"],
+  ];
+  const GROUNDING = {
+    grounded: "Grounded in PIE knowledge",
+    partial: "Partly grounded: some knowledge missing",
+    unverified: "No citations: verify before use",
+    not_found: "Not found in knowledge base",
+  };
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem("pie-chat:" + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem("pie-chat:" + k, JSON.stringify(v)); }catch(e){} },
+  };
+  let messages = [];   // the open chat: {role, content, response?, error?, ts}
+  // ---- module scope: one, several or all modules (?modules=ess,inventory in the address)
+  const moduleLabel = m => m.length <= 4 ? m.toUpperCase() : m.charAt(0).toUpperCase() + m.slice(1);
+  const legacy = store.get("module", "");
+  const picker = PieModules.create($("modules"), {
+    title: "Answer from modules",
+    selected: PieModules.fromUrl() || store.get("modules", legacy ? [legacy] : []),
+    onChange: sel => { store.set("modules", sel); renderChatbar(); },
+  });
+
+  // ---- audience: who the answer is for (?audience=developer or client_technical in the address).
+  // It stays for the whole conversation until changed; it changes presentation, never the knowledge.
+  const AUDIENCE_LABELS = {marketing: "Marketing Team", client_nontechnical: "Client (non-technical)",
+                           client_technical: "Client (technical)", developer: "Developer", stakeholder: "Stakeholder"};
+  function setAudience(key){
+    key = AUDIENCE_LABELS[key] ? key : "marketing";
+    const isClient = key.startsWith("client_");
+    $("audience").value = isClient ? "client" : key;
+    $("client-type").value = isClient ? key.slice(7) : $("client-type").value;
+    $("client-type").hidden = !isClient;
+  }
+  const audience = () => $("audience").value === "client" ? "client_" + $("client-type").value : $("audience").value;
+  function audienceChanged(){
+    $("client-type").hidden = $("audience").value !== "client";
+    store.set("audience", audience());
+    const u = new URLSearchParams(location.search); u.set("audience", audience());
+    history.replaceState(history.state, "", location.pathname + "?" + u.toString().replace(/%2C/g, ",") + location.hash);
+    if (!messages.length) render();
+    else { toast("Next answers are for: " + AUDIENCE_LABELS[audience()]); renderChatbar(); }
+  }
+  setAudience(new URLSearchParams(location.search).get("audience") || store.get("audience", "marketing"));
+  $("audience").addEventListener("change", audienceChanged);
+  $("client-type").addEventListener("change", audienceChanged);
+  // Conversations are stored on the PIE server as chat sessions; the browser only remembers which one is open.
+  function saveMessages(){ store.set("session", current ? current.sessionId : null); }
+  let busy = false;
+  let justAnswered = false;
+  // Backend address: an exported file's embedded setting, else frontend/config.js.
+  const API = (b => b && !b.endsWith("/") ? b + "/" : b)((window.__PIE_CHAT__ && window.__PIE_CHAT__.apiBase) || (window.PIE_CONFIG && window.PIE_CONFIG.apiBase) || "");
+  const API_BASE = API;
+  const serverless = !API_BASE;
+  // Exported copies point their page links at the PIE server; the bare template hides them.
+  // An exported chat file travels alone: the other pages are not next to it.
+  if (window.__PIE_CHAT__) $("appnav").hidden = true;
+
+  // ---- chat sessions (stored on the server; each has its own history, modules and audience)
+  // The owner is the signed-in user when the web server passes one (X-PIE-User), else this browser's id.
+  let userId = store.get("userId", "");
+  if (!userId){ userId = "u-" + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)); store.set("userId", userId); }
+  let current = null;          // the open session (null = a new chat, created on the first question)
+  let sessionList = [];
+  const qs = o => new URLSearchParams({userId, ...o}).toString();
+  async function api(path, opts = {}){
+    const r = await fetch(API_BASE + path, {...opts, headers: {"Content-Type": "application/json", ...(opts.headers || {})}});
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(typeof data.detail === "string" ? data.detail : `Request failed (${r.status})`);
+    return data;
+  }
+  const scopeText = s => (s.modules && s.modules.length ? s.modules.map(moduleLabel).join(" + ") : "All modules") + " · " + (AUDIENCE_LABELS[s.audience] || "Marketing Team");
+  const when = t => { const d = new Date(t), now = new Date(); const same = d.toDateString() === now.toDateString();
+    return same ? d.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"}) : d.toLocaleDateString([], {day: "numeric", month: "short"}); };
+  function bucket(t){
+    const d = new Date(t), today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = Math.floor((today - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5);
+    return days <= 0 ? "Today" : days === 1 ? "Yesterday" : days < 7 ? "Previous 7 days" : days < 30 ? "Previous 30 days" : "Older";
+  }
+  function renderSessions(){
+    const list = $("chat-list");
+    if (serverless){ list.innerHTML = '<div class="side-empty">Chats are saved on the PIE server; none is configured.</div>'; return; }
+    if (!sessionList.length){ list.innerHTML = `<div class="side-empty">${$("chat-search").value.trim() ? "No chat matches." : "No saved chats yet. Ask a question to start one."}</div>`; return; }
+    let html = "", last = "";
+    for (const s of sessionList){
+      const b = bucket(s.updatedAt);
+      if (b !== last){ html += `<div class="side-group">${b}</div>`; last = b; }
+      html += `<div class="sitem" role="button" tabindex="0" data-session="${esc(s.sessionId)}" aria-current="${!!(current && current.sessionId === s.sessionId)}"
+        title="${esc(s.title)}&#10;${esc(scopeText(s))}&#10;Created ${esc(new Date(s.createdAt).toLocaleString())} · updated ${esc(new Date(s.updatedAt).toLocaleString())}">
+        <span class="t">${esc(s.title)}</span><small>${esc(scopeText(s))} · ${esc(when(s.updatedAt))}</small>
+        <span class="acts"><span data-act="rename" title="Rename">✎</span><span data-act="archive" title="${s.archived ? "Restore" : "Archive"}">${s.archived ? "↺" : "🗄"}</span><span data-act="delete" title="Delete">🗑</span></span></div>`;
+    }
+    list.innerHTML = html;
+  }
+  let searchTimer;
+  async function loadSessions(){
+    if (serverless) return renderSessions();
+    try{
+      const q = $("chat-search").value.trim();
+      sessionList = (await api("api/sessions?" + qs({...(q ? {q} : {}), archived: $("show-archived").checked}))).sessions;
+    }catch(e){ sessionList = []; }
+    renderSessions();
+  }
+  function renderChatbar(){
+    const s = current || {title: "New chat", modules: picker.get(), audience: audience()};
+    $("chat-title").textContent = s.title;
+    $("chat-title").disabled = !current;
+    $("chat-title").title = current ? "Rename this chat" : "The title is created from your first question";
+    $("chat-ctx").innerHTML = `<span class="chip">${esc(s.modules && s.modules.length ? s.modules.map(moduleLabel).join(" + ") : "All modules")}</span>` +
+      `<span class="chip aud">for: ${esc(AUDIENCE_LABELS[s.audience] || AUDIENCE_LABELS[audience()])}</span>` +
+      (current ? `<span class="chip" title="Created ${esc(new Date(current.createdAt).toLocaleString())}">${esc(current.messageCount / 2 | 0)} question${current.messageCount === 2 ? "" : "s"} · ${esc(when(current.updatedAt))}</span>` : "");
+  }
+  async function openSession(id){
+    try{
+      const s = await api(`api/sessions/${encodeURIComponent(id)}?` + qs({}));
+      current = s;
+      messages = (s.messages || []).map(m => m.role === "user" ? {role: "user", content: m.content, ts: Date.parse(m.createdAt)}
+        : {role: "assistant", response: m.response || {answer: m.content}, ts: Date.parse(m.createdAt)});
+      // The chat continues with the modules and audience it was using.
+      picker.set(s.modules || [], true); store.set("modules", s.modules || []);
+      setAudience(s.audience || "marketing"); store.set("audience", audience());
+      saveMessages(); justAnswered = false; render(); renderSessions(); closeSide();
+    }catch(e){ toast("Could not open that chat: " + e.message); if (current && current.sessionId === id) newChat(); }
+  }
+  function newChat(){
+    current = null; messages = []; saveMessages(); render(); renderSessions(); closeSide(); $("input").focus();
+  }
+  async function renameSession(id){
+    const s = sessionList.find(x => x.sessionId === id) || current;
+    const title = prompt("Rename chat", s ? s.title : "");
+    if (title === null || !title.trim()) return;
+    try{
+      const u = await api(`api/sessions/${encodeURIComponent(id)}`, {method: "PATCH", body: JSON.stringify({userId, title: title.trim()})});
+      if (current && current.sessionId === id) current = {...current, ...u};
+      await loadSessions(); renderChatbar();
+    }catch(e){ toast("Rename failed: " + e.message); }
+  }
+  async function archiveSession(id){
+    const s = sessionList.find(x => x.sessionId === id);
+    try{
+      await api(`api/sessions/${encodeURIComponent(id)}`, {method: "PATCH", body: JSON.stringify({userId, archived: !(s && s.archived)})});
+      if (current && current.sessionId === id && !(s && s.archived)) newChat();
+      toast(s && s.archived ? "Chat restored" : "Chat archived"); loadSessions();
+    }catch(e){ toast("Archive failed: " + e.message); }
+  }
+  async function deleteSession(id){
+    const s = sessionList.find(x => x.sessionId === id);
+    if (!confirm(`Delete "${s ? s.title : "this chat"}"? This cannot be undone.`)) return;
+    try{
+      await api(`api/sessions/${encodeURIComponent(id)}?` + qs({}), {method: "DELETE"});
+      if (current && current.sessionId === id) newChat();
+      loadSessions();
+    }catch(e){ toast("Delete failed: " + e.message); }
+  }
+  function closeSide(){ $("side").classList.remove("open"); $("side-toggle").setAttribute("aria-expanded", "false"); }
+  $("side-toggle").addEventListener("click", () => { const open = $("side").classList.toggle("open"); $("side-toggle").setAttribute("aria-expanded", String(open)); });
+  $("new-chat").addEventListener("click", newChat);
+  $("chat-title").addEventListener("click", () => { if (current) renameSession(current.sessionId); });
+  $("chat-search").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(loadSessions, 250); });
+  $("show-archived").addEventListener("change", loadSessions);
+  $("chat-list").addEventListener("click", e => {
+    const item = e.target.closest("[data-session]"); if (!item) return;
+    const act = e.target.closest("[data-act]");
+    if (act){ e.stopPropagation(); ({rename: renameSession, archive: archiveSession, delete: deleteSession})[act.dataset.act](item.dataset.session); return; }
+    if (!current || current.sessionId !== item.dataset.session) openSession(item.dataset.session);
+  });
+  $("chat-list").addEventListener("keydown", e => { const item = e.target.closest("[data-session]"); if (item && e.key === "Enter") openSession(item.dataset.session); });
+  // A conversation kept only in this browser (before chats were saved) becomes a saved chat once.
+  async function importLocalConversation(){
+    const old = store.get("messages", []).filter(m => !m.error);
+    if (!old.length) return null;
+    try{
+      const s = await api("api/sessions", {method: "POST", body: JSON.stringify({userId, modules: picker.get(), audience: audience(),
+        messages: old.map(m => ({role: m.role, content: m.content || "", response: m.response || null}))})});
+      try{ localStorage.removeItem("pie-chat:messages"); }catch(e){}
+      return s.sessionId;
+    }catch(e){ return null; }
+  }
+
+  // ---- theme
+  const theme = store.get("theme", "");
+  if (theme) document.documentElement.setAttribute("data-theme", theme);
+  $("theme").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next); store.set("theme", next);
+  });
+  function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800); }
+
+  // ---- safe Markdown (escape first, then a small subset)
+  function inline(s){
+    return s
+      .replace(/&lt;br\s*\/?&gt;/gi, "<br>")   // models put <br> in table cells; the rest stays escaped
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>")
+      .replace(/\[(K\d+)\]/g, '<button type="button" class="cite" data-ref="$1" aria-label="Source $1">$1</button>');
+  }
+  const LIST_RE = /^\s*([-*•]|\d+[.)])\s+/;
+  const indentOf = l => l.match(/^\s*/)[0].replace(/\t/g, "    ").length;
+  // Parses a list starting at lines[i] with the given indent; deeper-indented list
+  // lines become nested lists; a blank line followed by a sibling item continues it.
+  function parseList(lines, i, indent){
+    const first = lines[i];
+    const ordered = /^\s*\d+[.)]\s+/.test(first);
+    const start = ordered ? parseInt(first.trim(), 10) : 1;
+    const items = [];
+    while (i < lines.length){
+      const line = lines[i];
+      if (!line.trim()){
+        let j = i + 1; while (j < lines.length && !lines[j].trim()) j++;
+        if (j < lines.length && LIST_RE.test(lines[j]) && indentOf(lines[j]) >= indent){ i = j; continue; }
+        break;
+      }
+      const ind = indentOf(line);
+      if (LIST_RE.test(line) && ind === indent){
+        items.push({text: line.replace(LIST_RE, ""), children: ""}); i++; continue;
+      }
+      if (ind > indent && items.length){
+        if (LIST_RE.test(line)){ const r = parseList(lines, i, ind); items[items.length - 1].children += r.html; i = r.next; continue; }
+        items[items.length - 1].text += " " + line.trim(); i++; continue;
+      }
+      break;
+    }
+    const lis = items.map(it => `<li>${inline(it.text)}${it.children}</li>`).join("");
+    const html = ordered ? `<ol${start > 1 ? ` start="${start}"` : ""}>${lis}</ol>` : `<ul>${lis}</ul>`;
+    return {html, next: i};
+  }
+  function markdown(src){
+    const lines = esc(src).replace(/\r/g, "").split("\n");
+    const out = []; let i = 0;
+    while (i < lines.length){
+      const line = lines[i];
+      if (/^```/.test(line)){ const buf = []; i++; while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]); i++; out.push(`<pre><code>${buf.join("\n")}</code></pre>`); continue; }
+      const h = line.match(/^(#{1,4})\s+(.*)$/); if (h){ out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`); i++; continue; }
+      if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\s*\|?\s*:?-{2,}/.test(lines[i+1])){
+        const cells = l => l.trim().replace(/^\||\|$/g, "").split("|").map(c => inline(c.trim()));
+        const head = cells(line); i += 2; const rows = [];
+        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) rows.push(cells(lines[i++]));
+        out.push(`<div class="tbl"><table><thead><tr>${head.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+        continue;
+      }
+      if (LIST_RE.test(line)){ const r = parseList(lines, i, indentOf(line)); out.push(r.html); i = r.next; continue; }
+      if (!line.trim()){ i++; continue; }
+      const para = [line]; i++;
+      while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|```|\s*([-*•]|\d+[.)])\s|\s*\|)/.test(lines[i])) para.push(lines[i++]);
+      out.push(`<p>${inline(para.join(" "))}</p>`);
+    }
+    return out.join("");
+  }
+
+  // ---- rendering
+  // Relationship links need the other PIE pages next to this one (not in an exported chat file).
+  const relLink = sid => sid && !window.__PIE_CHAT__ ? `<a class="rel" href="relations.html?screen=${encodeURIComponent(sid)}" target="_blank" rel="noopener" title="Screen → API → backend → tables">Relationships ↗</a>` : "";
+  function sourceHtml(s, idx){
+    const ev = (s.evidence || []).slice(0, 3).map(e => `<div><code>${esc(e.source)}</code> ${esc(e.detail || "")}</div>`).join("");
+    const where = [s.module, s.capability].filter(Boolean).map(esc).join(" · ");
+    return `<div class="src" id="src-${idx}-${esc(s.ref)}">
+      <div class="row"><span class="ref">${esc(s.ref)}</span><span class="st ${esc(s.status)}">${s.status === "REVIEW" || s.status === "AI" ? "⚠ unconfirmed" : "✓ " + esc(s.status.toLowerCase())}</span>
+      <b>${esc(s.title)}</b><span class="chip">${esc((s.kind || "").replace("_", " "))}</span>${where ? `<span class="chip">${where}</span>` : ""}${relLink(s.screenId)}</div>
+      <div class="txt">${esc((s.text || "").slice(0, 320))}${(s.text || "").length > 320 ? "…" : ""}</div>${ev ? `<div class="txt">${ev}</div>` : ""}</div>`;
+  }
+
+  // ---- "How PIE answered": the answer trace
+  const kv = rows => `<div class="kv">${rows.filter(r => r[1] !== "" && r[1] != null && !(Array.isArray(r[1]) && !r[1].length))
+    .map(([k, v]) => `<span>${esc(k)}</span><b>${Array.isArray(v) ? v.map(x => `<span class="q">${esc(x)}</span>`).join("") : esc(v)}</b>`).join("")}</div>`;
+  const miniTable = (head, rows) => rows.length ? `<div class="ttable"><table><thead><tr>${head.map(h => `<th${h.startsWith("#") ? ' class="num"' : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>` : "";
+  function stepDetail(s){
+    switch (s.step){
+      case "understand": return kv([
+        ["Intents", (s.intents || []).map(i => i.label + (i.matchedWord ? ` ("${i.matchedWord}")` : ""))],
+        ["Modules", (s.modules || []).length ? s.modules : s.moduleSource], ["Module from", (s.modules || []).length ? s.moduleSource : ""],
+        ["Answer written for", s.audience], ["Industry", s.industry], ["Persona in the question", s.persona],
+        ["Follow-up", s.followUp ? "yes: combined with the previous question" : ""], ["Read as", s.contextMessage]]);
+      case "plan": return kv([["Planner", s.planner], ["Keyword query", s.keywordQuery], ["AI planner queries", s.plannerQueries],
+        ["All search queries", s.searchQueries]]);
+      case "retrieve": return kv([["Candidates", s.candidates], ["Duplicates removed", s.duplicates], ["Kept for the answer", s.kept],
+          ["Order given to AI", s.ordering], ["Screens named", s.namedScreens], ["Unreviewed knowledge", s.reviewKnowledgeIncluded ? "included (toggle on)" : "excluded"]]) +
+        miniTable(["Retrieval route", "#Items"], (s.routes || []).map(r => `<tr><td>${esc(r.route)}</td><td class="num">${esc(r.items)}</td></tr>`)) +
+        ((s.droppedOverLimit || []).length ? `<div class="txt" style="margin-top:6px">Left out (over the limit): ${s.droppedOverLimit.map(d => esc(d.title)).join("; ")}</div>` : "");
+      case "coverage": return kv([["Not in the knowledge base", s.missing]]) +
+        ((s.notes || []).length ? `<ul class="txt" style="margin:4px 0 0;padding-left:18px">${s.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : "");
+      case "answer": return kv([["Written by", s.generator], ["Written for", s.audience], ["Audience instruction", s.audienceNote],
+        ["Rule", s.rule], ["Items given", s.itemsGiven], ["Earlier turns sent", s.historyTurns],
+        ["Answer guide", s.answerGuide], ["Also", s.extraGuides], ["Prompt size", s.contextChars ? s.contextChars.toLocaleString() + " characters" : ""],
+        ["Model error", s.llmError]]);
+      case "validate": return kv([["Cited", s.cited], ["Invalid citations removed", s.invalidCitations], ["Claim words not in knowledge", s.unsupportedTerms],
+        ["Citations filled in", s.citationFallback ? "yes: the model cited nothing, its field records are shown" : ""], ["Result", s.status]]);
+      default: return `<pre>${esc(JSON.stringify(s, null, 1))}</pre>`;
+    }
+  }
+  function traceHtml(r, idx){
+    const tr = r.trace;
+    if (!tr || !(tr.steps || []).length) return "";
+    const items = tr.retrieved || [];
+    const cited = items.filter(i => i.cited).length;
+    const rows = items.map(i => `<tr class="${i.cited ? "" : "dim"}"><td><b>${esc(i.ref || "")}</b></td><td>${i.cited ? '<span class="yes">✓ cited</span>' : "not used"}</td>
+      <td><span class="st ${esc(i.status)}">${esc(i.status || "")}</span></td><td>${esc(i.knowledgeType || i.kind || "")}</td>
+      <td title="${esc(i.text || "")}">${esc(i.title)}</td>
+      <td>${esc(i.module || "")}</td><td>${esc(i.route || "")}</td><td class="num">${i.score == null ? "" : esc(Number(i.score).toFixed(3))}</td>
+      <td>${relLink(i.screenId)}</td></tr>`);
+    return `<details class="trace" data-trace="${idx}"><summary>How PIE answered · ${tr.steps.length} steps · ${items.length} knowledge items, ${cited} cited</summary>
+      <ol class="steps">${tr.steps.map(s => `<li><div class="sname">${esc(s.step)}</div><div class="ssum">${esc(s.summary)}</div>${stepDetail(s)}</li>`).join("")}</ol>
+      <h4>Knowledge the answer could use (${items.length}), in the order the AI saw it</h4>
+      ${miniTable(["Ref", "Used", "Status", "Type", "Knowledge", "Module", "Found by", "#Score", ""], rows) || '<div class="txt">No knowledge items.</div>'}
+      ${tr.context ? `<details style="margin-top:10px"><summary class="txt" style="cursor:pointer">Exact text given to the AI (${tr.context.length.toLocaleString()} characters)</summary>
+        <h4>System instructions</h4><pre>${esc(tr.systemPrompt || "")}</pre><h4>Question, answer guide, knowledge items and coverage notes</h4><pre>${esc(tr.context)}</pre></details>` : ""}
+      ${r.runId && !window.__PIE_CHAT__ ? `<div class="txt" style="margin-top:8px">Saved in the <a href="logs.html#run=${esc(r.runId)}" target="_blank" rel="noopener">Activity Log</a> as run ${esc(r.runId.slice(0, 12))}.</div>` : ""}
+    </details>`;
+  }
+
+  function assistantHtml(m, idx){
+    if (m.error) return `<div class="card error"><div class="md"><p>${esc(m.error)}</p></div><div class="card-foot"><button class="btn small" type="button" data-retry="${idx}">Try again</button></div></div>`;
+    const r = m.response; const g = r.grounding || {};
+    const missing = (g.missing || []);
+    const notes = (g.notes || []).filter(n => /unavailable|Removed|Check before use|did not cite/.test(n));
+    return `<div class="card">
+      <div class="card-head">${r.audience ? `<span class="chip aud" title="Written for this audience">for: ${esc(r.audience.label)}</span>` : ""}<span class="chip">${esc(r.intentLabel || r.intent)}</span><span class="badge ${esc(g.status)}">${esc(GROUNDING[g.status] || g.status)}</span>
+        ${r.plan && r.plan.modules && r.plan.modules.length ? `<span class="chip">${esc(r.plan.modules.join(", "))}</span>` : ""}
+        ${r.plan && r.plan.industry ? `<span class="chip">industry: ${esc(r.plan.industry)}</span>` : ""}
+        ${r.plan && r.plan.persona ? `<span class="chip">audience: ${esc(r.plan.persona)}</span>` : ""}</div>
+      <div class="md">${markdown(r.answer || "")}</div>
+      ${missing.length ? `<div class="note"><b>Not in the PIE knowledge base:</b> ${missing.map(esc).join(", ")}.</div>` : ""}
+      ${notes.length ? `<div class="note"><ul>${notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>` : ""}
+      ${(r.sources || []).length ? `<details class="sources"${idx === messages.length - 1 ? " open" : ""}><summary>Sources used (${r.sources.length} of ${g.retrievedItems || r.sources.length} retrieved)</summary>${r.sources.map(s => sourceHtml(s, idx)).join("")}</details>` : ""}
+      ${traceHtml(r, idx)}
+      <div class="card-foot"><button class="btn small" type="button" data-copy="${idx}">Copy answer</button>
+        <span class="spacer"></span><span>${r.plan ? esc(r.plan.generator) : ""} · ${r.timings ? esc(r.timings.totalSeconds) + "s" : ""}</span></div>
+    </div>`;
+  }
+
+  function render(){
+    const t = $("thread");
+    if (!messages.length && !busy){
+      t.innerHTML = `<div class="empty"><h1>What would you like to know?</h1>
+        <p>Ask about GoodBooks ERP features, industries, demos, differentiators, gaps or tickets. PIE answers only from its knowledge base and shows the sources it used.</p>
+        <p class="ctxline">Answers are written for <span class="chip aud">${esc(AUDIENCE_LABELS[audience()])}</span> (change it with "For" at the top)</p>
+        <div class="prompts">${SUGGESTIONS.slice(0, 6).map(([c, q]) => `<button class="prompt" type="button" data-q="${esc(q)}"><small>${esc(c)}</small>${esc(q)}</button>`).join("")}</div></div>`;
+    } else {
+      t.innerHTML = messages.map((m, i) => m.role === "user"
+        ? `<div class="msg user"><div class="bubble">${esc(m.content)}</div></div>`
+        : `<div class="msg">${assistantHtml(m, i)}</div>`).join("") +
+        (busy ? `<div class="msg"><div class="card"><div class="loading"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="loading-text">Searching the PIE knowledge base and writing an answer…</span></div></div></div>` : "");
+    }
+    $("suggest").innerHTML = messages.length ? SUGGESTIONS.map(([c, q]) => `<button type="button" data-q="${esc(q)}" title="${esc(c)}">${esc(q)}</button>`).join("") : "";
+    $("send").disabled = busy || serverless;
+    // While waiting, show the loader at the bottom; when an answer arrives, show its start.
+    const last = t.lastElementChild;
+    if (justAnswered && last){ last.scrollIntoView({block: "start"}); justAnswered = false; }
+    else $("main").scrollTop = $("main").scrollHeight;
+    renderChatbar();
+  }
+
+  // ---- API
+  function historyForApi(){
+    // Past answers only give follow-ups context; send a short excerpt, not whole tables.
+    return messages.filter(m => !m.error).map(m => ({role: m.role,
+      content: (m.role === "user" ? m.content : (m.response ? m.response.answer : "")).slice(0, 2000)})).slice(-6);
+  }
+  async function ask(question){
+    question = question.trim();
+    if (!question || busy) return;
+    if (serverless){ toast("This copy has no PIE server address. See the note at the top."); return; }
+    const history = historyForApi();
+    messages.push({role: "user", content: question, ts: Date.now()});
+    busy = true; render(); saveMessages();
+    const started = Date.now();
+    const tick = setInterval(() => { const el = $("loading-text"); if (el) el.textContent = `Searching the PIE knowledge base and writing an answer… ${Math.round((Date.now() - started) / 1000)}s`; }, 1000);
+    try{
+      const r = await fetch(API_BASE + "api/chat", {method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: question, history, modules: picker.get(), audience: audience(), includeReview: $("include-review").checked,
+          userId, ...(current ? {sessionId: current.sessionId} : {newSession: true})})});
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok){
+        const d = data.detail;
+        // FastAPI validation errors are a list of {loc, msg}; show them as text.
+        const text = typeof d === "string" ? d : Array.isArray(d) ? d.map(x => `${(x.loc || []).slice(1).join(" ")}: ${x.msg}`).join("; ") : "";
+        throw new Error(text || `Request failed (${r.status})`);
+      }
+      messages.push({role: "assistant", response: data, ts: Date.now()});
+      if (data.session){ current = {...(current || {}), ...data.session}; loadSessions(); }
+    }catch(e){
+      const reason = e instanceof TypeError
+        ? `the PIE server${API_BASE ? " at " + API_BASE : ""} did not respond. Check that it is running; if it is, restart it (Ctrl+C, then start uvicorn again) so it loads the current version`
+        : e.message;
+      messages.push({role: "assistant", error: `PIE could not answer: ${reason}`, question, ts: Date.now()});
+    }finally{
+      clearInterval(tick); busy = false; justAnswered = true; saveMessages(); render();
+    }
+  }
+  async function loadStatus(){
+    try{
+      const r = await fetch(API_BASE + "api/chat/status"); const s = await r.json();
+      if (!r.ok) throw new Error(s.detail || r.status);
+      const types = s.byType || {};
+      $("kb").innerHTML = `<span><span class="dot"></span>Qdrant <b>${esc(s.collection)}</b>: <b>${esc(s.points.toLocaleString())}</b> knowledge items</span>
+        <span title="${esc(s.verifiedModules.join(", "))}">Verified analysis: <b>${s.verifiedModules.length > 4 ? esc(s.verifiedModules.length + " modules") : esc(s.verifiedModules.join(", ") || "none")}</b></span>
+        <span>Tickets: <b>${esc(s.tickets)}</b></span><span>AI: <b>${esc(s.llm)}</b></span>`;
+      const ordered = [...s.verifiedModules, ...s.modules.filter(m => !s.verifiedModules.includes(m))];
+      picker.setOptions(ordered.map(m => ({value: m, label: moduleLabel(m), note: s.verifiedModules.includes(m) ? "✓ verified" : ""})));
+      void types;
+    }catch(e){
+      const where = API_BASE ? ` at ${esc(API_BASE)}` : "";
+      $("kb").innerHTML = `<span><span class="dot off"></span>Cannot reach the PIE server${where}. Check that it is running; if it is, restart it so it loads the current version.</span>`;
+    }
+  }
+
+  // ---- events
+  const input = $("input");
+  function grow(){ input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 180) + "px"; $("count").textContent = `${input.value.length}/2000`; }
+  input.addEventListener("input", grow);
+  input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); $("form").requestSubmit(); } });
+  $("form").addEventListener("submit", e => { e.preventDefault(); const q = input.value; input.value = ""; grow(); ask(q); });
+  document.addEventListener("click", e => {
+    const q = e.target.closest("[data-q]"); if (q){ ask(q.dataset.q); return; }
+    const c = e.target.closest(".cite");
+    if (c){
+      const card = c.closest(".msg"); const det = card && card.querySelector("details.sources");
+      if (det){ det.open = true; const el = det.querySelector(`[id$="-${c.dataset.ref}"]`); if (el){ el.scrollIntoView({block: "nearest", behavior: "smooth"}); el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 900); } }
+      return;
+    }
+    const cp = e.target.closest("[data-copy]");
+    if (cp){ const m = messages[+cp.dataset.copy]; if (m && m.response) copy(m.response.answer.replace(/\s?\[K\d+\]/g, "")); return; }
+    const rt = e.target.closest("[data-retry]");
+    if (rt){ const m = messages[+rt.dataset.retry]; if (m){ messages.splice(+rt.dataset.retry - 1, 2); ask(m.question || ""); } }
+  });
+  $("include-review").checked = store.get("includeReview", false);
+  $("include-review").addEventListener("change", e => store.set("includeReview", e.target.checked));
+  async function copy(text){
+    try{ await navigator.clipboard.writeText(text); toast("Answer copied"); }
+    catch(e){ const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); toast("Answer copied"); }catch(_){ toast("Copy failed"); } ta.remove(); }
+  }
+
+  if (serverless){
+    $("kb").innerHTML = `<span><span class="dot off"></span>No backend address is configured. Set apiBase in frontend/config.js (for example http://localhost:8000/usage/).</span>`;
+  } else {
+    loadStatus();
+  }
+  render(); input.focus();
+  (async () => {
+    if (!serverless){
+      // Reopen the chat that was open last (or move an old browser-only conversation into a saved chat).
+      const last = store.get("session", null) || await importLocalConversation();
+      if (last) await openSession(last);
+      await loadSessions();
+    } else renderSessions();
+    const qParam = new URLSearchParams(location.search).get("q");
+    if (qParam && !serverless){ history.replaceState(null, "", location.pathname); if (current) newChat(); ask(qParam); }
+  })();
+})();
+</script>
+</body>
+</html>

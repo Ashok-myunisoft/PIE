@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIE Relationships</title>
+<meta name="description" content="How each GoodBooks ERP screen connects to APIs, backend services and database tables, with the evidence for every link and the PIE knowledge held for the screen.">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#dfe3e8; --text:#17202a; --muted:#5b6673;
+  --accent:#2457d6; --accent-soft:#e7eefc; --ok:#1f7a4d; --ok-soft:#e3f4ea; --warn:#9a5b00; --warn-soft:#fdf1dc;
+  --bad:#a33a2b; --bad-soft:#fbe7e3; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --c-screen:#2457d6; --c-api:#7a4fd0; --c-backend:#0f7c8c; --c-table:#9a5b00; --line:#b8c0cc;
+  --radius:10px; --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+    --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+    --bad:#f08a78; --bad-soft:#3a1d18; --shadow:none;
+    --c-screen:#7ea2ff; --c-api:#b69cf5; --c-backend:#5cc6d4; --c-table:#f0b44c; --line:#4a5563;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+  --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+  --bad:#f08a78; --bad-soft:#3a1d18; --shadow:none;
+  --c-screen:#7ea2ff; --c-api:#b69cf5; --c-backend:#5cc6d4; --c-table:#f0b44c; --line:#4a5563;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:12px;word-break:break-all}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--border)}
+.top-inner{max-width:1600px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;min-width:0;margin-right:8px}
+.brand b{font-size:16px}.brand span{color:var(--muted);font-size:12px}
+.appnav{display:flex;gap:2px;flex-wrap:wrap;margin-right:auto}
+.appnav a{padding:6px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+.appnav a:hover{background:var(--surface-2);color:var(--text)}
+.appnav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.btn{color:var(--text);border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 11px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.layout{max-width:1600px;margin:0 auto;padding:16px;display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+aside.list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);position:sticky;top:70px;max-height:calc(100vh - 90px);display:flex;flex-direction:column}
+@media (max-width:900px){aside.list{position:static;max-height:360px}}
+.filters{padding:10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.filters input[type=search],.filters select{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
+.filters label{font-size:12px;color:var(--muted)}
+.filters .pmp{display:block}.filters .pmp-btn{width:100%;max-width:none;justify-content:space-between}
+.filters .pmp-list label{font-size:13px;color:var(--text)}
+.slist{overflow:auto;padding:4px}
+.slist button{display:block;width:100%;text-align:left;border:0;background:none;border-radius:7px;padding:6px 8px;cursor:pointer}
+.slist button:hover{background:var(--surface-2)}
+.slist button[aria-current="true"]{background:var(--accent-soft);color:var(--accent)}
+.slist small{display:block;color:var(--muted);font-size:11.5px}
+.slist .grp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:8px 8px 2px;font-weight:650}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:16px;min-width:0}
+.panel h2{font-size:16px;margin:0 0 4px}.panel h3{font-size:14px;margin:0 0 8px}
+.muted{color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.chip{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border)}
+.chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:6px 0 10px}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid var(--line);vertical-align:middle;margin-right:5px}
+.legend i.cand{border-top-style:dashed}
+.diagram{position:relative;overflow-x:auto}
+.cols{position:relative;display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:56px;min-width:820px;padding:4px 0}
+.col h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.node{position:relative;z-index:1;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--c);border-radius:8px;padding:6px 9px;margin-bottom:8px;font-size:12.5px;cursor:pointer;transition:opacity .15s,box-shadow .15s}
+.node b{display:block;word-break:break-word}
+.node small{display:block;color:var(--muted);font-size:11px;word-break:break-word}
+.node.screen{--c:var(--c-screen)}.node.api{--c:var(--c-api)}.node.backend{--c:var(--c-backend)}.node.table{--c:var(--c-table)}
+.node .ops{float:right;font-size:10.5px;font-weight:700;color:var(--c-table);margin-left:6px}
+.diagram.focus .node{opacity:.28}.diagram.focus .node.on{opacity:1;box-shadow:0 0 0 2px var(--c)}
+svg.wires{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+svg.wires path{fill:none;stroke:var(--line);stroke-width:1.4}
+svg.wires path.cand{stroke-dasharray:5 4}
+.diagram.focus svg.wires path{opacity:.12}.diagram.focus svg.wires path.on{opacity:1;stroke:var(--accent);stroke-width:2}
+table.grid{border-collapse:collapse;width:100%;font-size:12.5px}
+table.grid th,table.grid td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+table.grid th{color:var(--muted);font-weight:600;background:var(--surface-2);position:sticky;top:0}
+.tw{overflow-x:auto}
+tr.hl td{background:var(--accent-soft)}
+.ev{font-size:11.5px;color:var(--muted);margin-top:2px}
+.ev code{font-size:11px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.empty{padding:40px 10px;text-align:center;color:var(--muted)}
+.err{color:var(--bad)}
+.toggle{font-size:12px;color:var(--muted);display:inline-flex;gap:5px;align-items:center}
+</style>
+<script src="config.js"></script>
+<script src="modules.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><b>Relationships</b><span>Screen → API → backend → database, with the evidence for every link</span></div>
+    <nav class="appnav" aria-label="PIE pages"><a href="index.html">Home</a><a href="chat.html">Ask PIE</a><a href="catalog.html">Feature Catalog</a><a href="fields.html">Field Explorer</a><a href="relations.html" aria-current="page">Relationships</a><a href="logs.html">Activity Log</a></nav>
+    <button class="btn" id="theme" type="button" aria-label="Toggle colour theme">◐</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="list" aria-label="Screens">
+    <div class="filters">
+      <input type="search" id="q" placeholder="Search screens…" aria-label="Search screens">
+      <div id="modules"></div>
+      <label><input type="checkbox" id="mapped" checked> Only screens with APIs</label>
+      <span class="muted" id="count" style="font-size:12px"></span>
+    </div>
+    <div class="slist" id="slist"><div class="empty">Loading…</div></div>
+  </aside>
+  <main id="main"><div class="panel empty">Choose a screen on the left to see how it connects to the backend and database.</div></main>
+</div>
+<script>
+(() => {
+  "use strict";
+  const API = (b => b && !b.endsWith("/") ? b + "/" : b)((window.PIE_CONFIG && window.PIE_CONFIG.apiBase) || "/usage/");
+  const $ = id => document.getElementById(id);
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+  const store = {get(k, d){ try{ const v = localStorage.getItem("pie-rel:" + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+                 set(k, v){ try{ localStorage.setItem("pie-rel:" + k, JSON.stringify(v)); }catch(e){} }};
+  const theme = store.get("theme", "");
+  if (theme) document.documentElement.setAttribute("data-theme", theme);
+  $("theme").onclick = () => {
+    const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next); store.set("theme", next); draw();
+  };
+  let screens = [], current = null, data = null, onlyKey = false;
+  const picker = PieModules.create($("modules"), {title: "Show screens of", selected: PieModules.fromUrl() || [], onChange: () => renderList()});
+
+  async function get(path){
+    const r = await fetch(API + path);
+    const body = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(body.detail || `Request failed (${r.status})`);
+    return body;
+  }
+
+  // ---- screen list
+  function renderList(){
+    const q = $("q").value.trim().toLowerCase(), mods = picker.get(), mapped = $("mapped").checked;
+    const rows = screens.filter(s => (!mods.length || mods.includes(s.module)) && (!mapped || s.apis > 0) &&
+      (!q || (s.label || "").toLowerCase().includes(q) || s.screenId.toLowerCase().includes(q)));
+    $("count").textContent = `${rows.length} of ${screens.length} screens`;
+    let html = "", last = "";
+    for (const s of rows){
+      if (s.module !== last){ html += `<div class="grp">${esc(s.module)}</div>`; last = s.module; }
+      html += `<button type="button" data-sid="${esc(s.screenId)}" aria-current="${s.screenId === current}">${esc(s.label || s.screenId)}
+        <small>${s.apis} API${s.apis === 1 ? "" : "s"} · ${s.tables} table${s.tables === 1 ? "" : "s"}${s.hasFields ? " · fields" : ""}</small></button>`;
+    }
+    $("slist").innerHTML = html || '<div class="empty">No screens match.</div>';
+  }
+
+  // ---- one screen
+  async function open(sid){
+    current = sid; renderList();
+    const qs = new URLSearchParams(location.search); qs.set("screen", sid);   // keeps ?modules=
+    history.replaceState(null, "", "?" + qs.toString().replace(/%2C/g, ","));
+    $("main").innerHTML = '<div class="panel empty">Loading relationships…</div>';
+    try { data = await get("api/relations/screen/" + encodeURIComponent(sid)); }
+    catch (e) { $("main").innerHTML = `<div class="panel err">${esc(e.message)}</div>`; return; }
+    onlyKey = data.tables.length > 18;
+    renderScreen();
+  }
+
+  const statusChip = (st, conf) => `<span class="chip ${st === "OBSERVED" ? "ok" : "warn"}" title="${st === "OBSERVED" ? "Seen directly in code or configuration" : "Inferred from code (SQL text); likely but not proven"}">${esc(st || "?")}${conf != null ? " " + Math.round(conf * 100) + "%" : ""}</span>`;
+  const evList = (evs, n = 3) => (evs || []).slice(0, n).map(e => `<div class="ev">${e.where ? `<code>${esc(e.where)}</code> ` : ""}${esc(e.what || e.fact || "")}${(e.operations || []).length ? ` <span class="chip">${esc(e.operations.join("/"))}</span>` : ""}</div>`).join("");
+
+  function visibleTables(){ return data.tables.filter(t => !onlyKey || t.fields.length || t.operations.includes("WRITE")); }
+
+  function renderScreen(){
+    const d = data, s = d.screen, st = d.stats;
+    const tables = visibleTables();
+    const tableId = {}; tables.forEach(t => { tableId[t.name] = t.id; });
+    const eps = []; const epSeen = new Set();
+    d.apis.forEach(a => a.endpoints.forEach(ep => { if (!epSeen.has(ep.id)){ epSeen.add(ep.id); eps.push(ep); } }));
+    const kn = d.knowledge || {};
+    const knCount = Object.values(kn).reduce((n, g) => n + g.count, 0);
+
+    $("main").innerHTML = `
+      <div class="panel">
+        <h2>${esc(s.label)} <span class="muted" style="font-weight:400;font-size:13px">${esc(s.screenId)}</span></h2>
+        <div class="chips"><span class="chip">module: ${esc(s.module)}</span>${s.status ? `<span class="chip ${s.status === "CONFIRMED" ? "ok" : "warn"}">screen ${esc(s.status.toLowerCase())}</span>` : ""}
+          <span class="chip">${st.apis} APIs</span><span class="chip">${st.endpoints} backend endpoints</span><span class="chip">${st.services} services</span>
+          <span class="chip">${st.tables} tables (${st.writes} written)</span><span class="chip">${st.fieldsMapped} fields mapped to columns</span>
+          ${d.knowledge ? `<span class="chip">${knCount} PIE knowledge items</span>` : ""}</div>
+        <div class="legend"><span><i></i>observed link</span><span><i class="cand"></i>candidate link (inferred from SQL)</span>
+          <span>Hover or click a box to follow its links.</span>
+          ${d.tables.length > tables.length || onlyKey ? `<label class="toggle"><input type="checkbox" id="onlykey" ${onlyKey ? "checked" : ""}> only tables this screen writes or stores fields in (${tables.length} of ${d.tables.length})</label>`
+            : `<label class="toggle"><input type="checkbox" id="onlykey"> only tables this screen writes or stores fields in</label>`}</div>
+        <div class="diagram" id="diagram">
+          <div class="cols" id="cols">
+            <div class="col"><h4>Screen</h4><div class="node screen" data-node="S"><b>${esc(s.label)}</b><small>${esc(s.module)}${d.fieldDictionary ? ` · form ${esc(d.fieldDictionary.form)} · ${d.fieldDictionary.fields} fields` : ""}</small></div></div>
+            <div class="col"><h4>APIs called (${d.apis.length})</h4>${d.apis.map(a => `<div class="node api" data-node="${esc(a.id)}"><b>${esc(a.method)} ${esc(a.route)}</b><small>${esc(a.status)} · ${Math.round((a.confidence || 0) * 100)}%</small></div>`).join("") || '<div class="muted">No API found.</div>'}</div>
+            <div class="col"><h4>Backend (${eps.length})</h4>${eps.map(ep => `<div class="node backend" data-node="${esc(ep.id)}"><b>${esc(ep.name)}</b><small>${ep.services.map(x => esc(x.name)).join(", ") || "no service"}</small></div>`).join("") || '<div class="muted">No backend endpoint found.</div>'}</div>
+            <div class="col"><h4>Database (${tables.length})</h4>${tables.map(t => `<div class="node table" data-node="${esc(t.id)}" data-table="${esc(t.name)}"><span class="ops">${esc(t.operations.map(o => o[0]).join(""))}</span><b>${esc(t.name)}</b><small>${t.fields.length ? `${t.fields.length} field${t.fields.length === 1 ? "" : "s"} of this screen` : esc(t.objectType || "")}${t.alsoUsedByCount ? ` · ${t.alsoUsedByCount} other screens` : ""}</small></div>`).join("") || '<div class="muted">No database object found.</div>'}</div>
+          </div>
+          <svg class="wires" id="wires" aria-hidden="true"></svg>
+        </div>
+      </div>
+
+      <div class="panel"><h3>Database tables</h3><div class="tw"><table class="grid"><thead><tr><th>Table</th><th>Access</th><th>Link</th><th>Reached through</th><th>This screen's fields stored here</th><th>Also used by</th><th>Evidence</th></tr></thead><tbody>
+        ${d.tables.map(t => `<tr id="t-${esc(t.name)}"><td><b>${esc(t.name)}</b><div class="ev">${esc(t.schema || "")} ${esc(t.objectType || "")}</div>${t.definedIn.length ? `<div class="ev">defined in <code>${esc(t.definedIn[0])}</code></div>` : ""}</td>
+          <td>${t.operations.map(o => `<span class="chip ${o === "WRITE" ? "warn" : ""}">${esc(o)}</span>`).join(" ") || "-"}</td>
+          <td>${t.statuses.map(x => statusChip(x, t.confidence)).join(" ")}</td>
+          <td style="white-space:nowrap">${t.via.map(v => `<div><code style="word-break:normal">${esc(v)}</code></div>`).join("")}</td>
+          <td>${t.fields.length ? t.fields.slice(0, 12).map(f => `<div>${esc(f.label)} <span class="ev"><code>${esc(f.column)}</code>${f.dataType ? " " + esc(f.dataType) : ""}</span></div>`).join("") + (t.fields.length > 12 ? `<div class="ev">+${t.fields.length - 12} more</div>` : "") : '<span class="muted">-</span>'}</td>
+          <td>${t.alsoUsedBy.slice(0, 6).map(o => `<div><a href="?screen=${encodeURIComponent(o.screenId)}" data-sid="${esc(o.screenId)}">${esc(o.label)}</a> <span class="ev">${esc(o.module)}</span></div>`).join("")}${t.alsoUsedByCount > 6 ? `<div class="ev">+${t.alsoUsedByCount - 6} more</div>` : ""}${!t.alsoUsedByCount ? '<span class="muted">only this screen</span>' : ""}</td>
+          <td>${evList(t.evidence)}</td></tr>`).join("")}
+      </tbody></table></div></div>
+
+      <div class="two">
+        <div class="panel"><h3>APIs and backend</h3><div class="tw"><table class="grid"><thead><tr><th>API</th><th>Implemented by</th><th>Evidence</th></tr></thead><tbody>
+          ${d.apis.map(a => `<tr><td><b>${esc(a.method)} ${esc(a.route)}</b><div>${statusChip(a.status, a.confidence)}</div></td>
+            <td>${a.endpoints.map(ep => `<div><b>${esc(ep.name)}</b> ${statusChip(ep.status, ep.confidence)}<div class="ev"><code>${esc(ep.file)}</code></div>${ep.services.map(x => `<div class="ev">${esc(x.relationship === "USES_SERVICE" ? "uses" : "calls")} <b>${esc(x.name)}</b>${x.file ? ` <code>${esc(x.file)}</code>` : ""}</div>`).join("")}</div>`).join("") || '<span class="muted">not found</span>'}</td>
+            <td>${evList(a.evidence)}${evList(a.apiEvidence.map(e => ({where: e.source, what: e.fact})), 2)}</td></tr>`).join("") || '<tr><td colspan="3" class="muted">This screen calls no API that PIE could map.</td></tr>'}
+        </tbody></table></div></div>
+        <div class="panel"><h3>Why PIE knows this screen exists</h3>
+          ${d.evidence.map(e => `<div class="ev" style="margin-bottom:4px"><code>${esc(e.source)}</code> ${esc(e.fact)}</div>`).join("") || '<div class="muted">No evidence recorded.</div>'}
+          <h3 style="margin-top:14px">PIE knowledge stored for this screen (Qdrant)</h3>
+          ${d.knowledge == null ? '<div class="muted">The knowledge base could not be reached.</div>' : Object.keys(kn).length ? Object.entries(kn).map(([type, g]) => `<details><summary><b>${esc(type)}</b> <span class="muted">(${g.count})</span></summary>${g.items.map(i => `<div class="ev">${esc(i.title)} ${i.status && i.status !== "PUBLISHED" ? '<span class="chip warn">review</span>' : ""}${i.readiness ? ` <span class="chip">${esc(i.readiness)}</span>` : ""}</div>`).join("")}${g.count > g.items.length ? `<div class="ev">+${g.count - g.items.length} more</div>` : ""}</details>`).join("") : '<div class="muted">No knowledge items for this screen.</div>'}
+          ${d.fieldDictionary ? `<p style="margin-top:12px"><a href="fields.html">Open the Field Explorer</a> for all ${d.fieldDictionary.fields} fields of this screen.</p>` : ""}
+          <p class="ev">Source: <code>${esc(d.graph.file)}</code> · built ${esc(new Date(d.graph.generatedAt).toLocaleString())}</p>
+        </div>
+      </div>`;
+
+    // Links drawn in the diagram: screen -> API -> backend -> table.
+    const edges = [];
+    d.apis.forEach(a => {
+      edges.push({from: "S", to: a.id, cand: a.status !== "OBSERVED"});
+      a.endpoints.forEach(ep => {
+        edges.push({from: a.id, to: ep.id, cand: ep.status !== "OBSERVED"});
+        ep.tables.forEach(tn => { if (tableId[tn]){ const t = tables.find(x => x.name === tn); edges.push({from: ep.id, to: tableId[tn], cand: !t.statuses.includes("OBSERVED")}); } });
+      });
+    });
+    const uniq = new Map(); edges.forEach(e => uniq.set(e.from + ">" + e.to, e));
+    data._edges = [...uniq.values()];
+    const ok = $("onlykey"); if (ok) ok.onchange = () => { onlyKey = ok.checked; renderScreen(); };
+    draw(); wire();
+  }
+
+  function draw(){
+    const svg = $("wires"), box = $("diagram");
+    if (!svg || !data || !data._edges) return;
+    const base = box.getBoundingClientRect();
+    const at = id => box.querySelector(`[data-node="${CSS.escape(id)}"]`);
+    svg.style.width = box.scrollWidth + "px"; svg.style.height = box.scrollHeight + "px";
+    svg.innerHTML = data._edges.map(e => {
+      const a = at(e.from), b = at(e.to); if (!a || !b) return "";
+      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      const x1 = ra.right - base.left + box.scrollLeft, y1 = ra.top + ra.height / 2 - base.top;
+      const x2 = rb.left - base.left + box.scrollLeft, y2 = rb.top + rb.height / 2 - base.top;
+      const dx = Math.max(24, (x2 - x1) / 2);
+      return `<path data-from="${esc(e.from)}" data-to="${esc(e.to)}" class="${e.cand ? "cand" : ""}" d="M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}"/>`;
+    }).join("");
+  }
+
+  // Hover or click a box: highlight everything connected to it, up and down the chain.
+  function connected(id){
+    const on = new Set([id]); const E = data._edges;
+    let grow = true;
+    const down = new Set([id]), up = new Set([id]);
+    while (grow){ grow = false;
+      E.forEach(e => { if (down.has(e.from) && !down.has(e.to)){ down.add(e.to); grow = true; } if (up.has(e.to) && !up.has(e.from)){ up.add(e.from); grow = true; } }); }
+    down.forEach(x => on.add(x)); up.forEach(x => on.add(x));
+    return on;
+  }
+  let pinned = null;
+  function focus(id){
+    const box = $("diagram"); if (!box) return;
+    box.querySelectorAll(".on").forEach(el => el.classList.remove("on"));
+    if (!id){ box.classList.remove("focus"); return; }
+    const on = connected(id);
+    box.classList.add("focus");
+    on.forEach(n => { const el = box.querySelector(`[data-node="${CSS.escape(n)}"]`); if (el) el.classList.add("on"); });
+    box.querySelectorAll("svg path").forEach(p => { if (on.has(p.dataset.from) && on.has(p.dataset.to)) p.classList.add("on"); });
+  }
+  function wire(){
+    const box = $("diagram"); pinned = null;
+    box.querySelectorAll(".node").forEach(n => {
+      n.onmouseenter = () => { if (!pinned) focus(n.dataset.node); };
+      n.onmouseleave = () => { if (!pinned) focus(null); };
+      n.onclick = () => {
+        pinned = pinned === n.dataset.node ? null : n.dataset.node; focus(pinned);
+        if (n.dataset.table){ const row = document.getElementById("t-" + n.dataset.table);
+          if (row){ document.querySelectorAll("tr.hl").forEach(r => r.classList.remove("hl")); row.classList.add("hl"); } }
+      };
+    });
+  }
+
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-sid]"); if (!b) return;
+    e.preventDefault(); open(b.dataset.sid); window.scrollTo({top: 0});
+  });
+  ["q", "mapped"].forEach(id => $(id).addEventListener("input", renderList));
+  addEventListener("resize", () => { draw(); if (pinned) focus(pinned); });
+
+  (async () => {
+    try {
+      const r = await get("api/relations/screens");
+      screens = r.screens;
+      picker.setOptions(r.modules.map(m => ({value: m, label: m.length <= 4 ? m.toUpperCase() : m.charAt(0).toUpperCase() + m.slice(1),
+                                              note: `${screens.filter(s => s.module === m).length} screens`})));
+      renderList();
+      const want = new URLSearchParams(location.search).get("screen");
+      if (want) open(want);
+      else if (!r.graphs.length) $("main").innerHTML = '<div class="panel empty">No relationship graph found. Run build-evidence-graph for a module first.</div>';
+    } catch (e) {
+      $("slist").innerHTML = `<div class="empty err">${esc(e.message)}</div>`;
+      $("main").innerHTML = `<div class="panel err">Cannot reach the PIE server at ${esc(API)}: ${esc(e.message)}. Start it with start_backend.ps1.</div>`;
+    }
+  })();
+})();
+</script>
+</body>
+</html>

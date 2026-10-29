@@ -1,0 +1,44 @@
+# PIE on the server (Contabo, /opt/pie). The GitHub workflow copies this file there and
+# writes /opt/pie/.env with the image names and tag; it never touches the files below.
+#
+# /opt/pie/
+#   docker-compose.yml   this file (copied by the workflow)
+#   .env                 PIE_IMAGE_PREFIX, PIE_TAG, PIE_HTTP_PORT (written by the workflow)
+#   pie.env              app secrets: OpenAI, Qdrant, ...  (you create it; same format as .env.example)
+#   htpasswd             sign-in users for the web pages     (you create it)
+#   outputs/             module catalogs, field dictionaries, chats, logs (you copy it once)
+#
+# Manual use on the server:  cd /opt/pie && docker compose ps | logs -f | restart
+#
+# Qdrant keeps running separately on this server (QDRANT_URL in pie.env).
+
+services:
+  backend:
+    image: ${PIE_IMAGE_PREFIX:?set PIE_IMAGE_PREFIX in .env}/pie-backend:${PIE_TAG:-latest}
+    restart: unless-stopped
+    volumes:
+      - ./pie.env:/app/.env:ro
+      - ./outputs:/app/outputs
+    environment:
+      # Pages and API share nginx's address, so no cross-site origins are needed.
+      PIE_CORS_ORIGINS: "http://localhost"
+    # Not published: only nginx (frontend) reaches it, on the internal network.
+    expose:
+      - "8000"
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  frontend:
+    image: ${PIE_IMAGE_PREFIX:?set PIE_IMAGE_PREFIX in .env}/pie-frontend:${PIE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${PIE_HTTP_PORT:-80}:80"
+    volumes:
+      - ./htpasswd:/etc/nginx/htpasswd:ro
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }

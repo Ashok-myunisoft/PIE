@@ -1,0 +1,277 @@
+{
+  "Module": {
+    "ModuleCode": "HRMS_LEAVE_REQUEST",
+    "ModuleName": "Leave Request",
+    "ModuleCategory": "HRMS",
+    "AnalysisSource": [
+      "Frontend HTML",
+      "Frontend TypeScript",
+      "UI Screenshot"
+    ],
+    "ConfidenceScore": 92
+  },
+
+  "ConfigItems": [
+    {
+      "ItemCode": "LV_CFG_001",
+      "ItemName": "Employee Selection Mode",
+      "ItemCategory": "Role",
+      "Description": "Controls which employee picklist is displayed based on the logged-in user's role.",
+      "PlainLanguageDesc": "The screen automatically shows the correct employee selector depending on whether the user is an ERP user, ESS employee, Admin, Functional Manager or Site Manager.",
+      "IsMandatory": 1,
+      "DefaultValue": "Role Based",
+      "EstimatedHours": 4,
+      "Evidence": [
+        "ErpEmployeePicklistRequired",
+        "EssFunctionalEmployeePicklistRequired",
+        "EssSelfEmployeePicklistRequired",
+        "EssAdminEmployeePicklistRequired",
+        "EssSiteEmployeePicklistRequired"
+      ]
+    },
+    {
+      "ItemCode": "LV_CFG_002",
+      "ItemName": "Leave Number",
+      "ItemCategory": "BizTransaction",
+      "Description": "Select an existing leave transaction.",
+      "PlainLanguageDesc": "Users can retrieve previously created leave requests.",
+      "IsMandatory": 0,
+      "DefaultValue": "",
+      "EstimatedHours": 2
+    },
+    {
+      "ItemCode": "LV_CFG_003",
+      "ItemName": "Leave Date",
+      "ItemCategory": "BizTransaction",
+      "Description": "Transaction date for leave request.",
+      "PlainLanguageDesc": "Date on which the leave application is created.",
+      "IsMandatory": 1,
+      "DefaultValue": "Today",
+      "EstimatedHours": 1
+    },
+    {
+      "ItemCode": "LV_CFG_004",
+      "ItemName": "Reference Information",
+      "ItemCategory": "DocumentFormat",
+      "Description": "Reference number and reference date.",
+      "PlainLanguageDesc": "Stores external approval or document reference details.",
+      "IsMandatory": 0,
+      "DefaultValue": "",
+      "EstimatedHours": 2
+    },
+    {
+      "ItemCode": "LV_CFG_005",
+      "ItemName": "Leave Status Display",
+      "ItemCategory": "Workflow",
+      "Description": "Displays current workflow status.",
+      "PlainLanguageDesc": "Shows whether the leave request is pending, approved or rejected.",
+      "IsMandatory": 1,
+      "DefaultValue": "Pending",
+      "EstimatedHours": 2
+    },
+    {
+      "ItemCode": "LV_CFG_006",
+      "ItemName": "Leave Type Selection",
+      "ItemCategory": "BizTransaction",
+      "Description": "Select leave category.",
+      "PlainLanguageDesc": "Choose the type of leave to apply.",
+      "IsMandatory": 1,
+      "DefaultValue": "",
+      "EstimatedHours": 3
+    },
+    {
+      "ItemCode": "LV_CFG_007",
+      "ItemName": "Leave Date Range",
+      "ItemCategory": "BizTransaction",
+      "Description": "From Date and To Date.",
+      "PlainLanguageDesc": "Defines the leave period.",
+      "IsMandatory": 1,
+      "DefaultValue": "",
+      "EstimatedHours": 2
+    },
+    {
+      "ItemCode": "LV_CFG_008",
+      "ItemName": "Leave Duration",
+      "ItemCategory": "Infrastructure",
+      "Description": "Calculates total leave days.",
+      "PlainLanguageDesc": "Automatically determines the number of leave days.",
+      "IsMandatory": 1,
+      "DefaultValue": "Auto Calculated",
+      "EstimatedHours": 4
+    },
+    {
+      "ItemCode": "LV_CFG_009",
+      "ItemName": "Quick Date Selection",
+      "ItemCategory": "BizTransaction",
+      "Description": "Shortcut buttons for Yesterday, Today and Tomorrow.",
+      "PlainLanguageDesc": "Users can quickly select commonly used dates.",
+      "IsMandatory": 0,
+      "DefaultValue": "Today",
+      "EstimatedHours": 2
+    },
+    {
+      "ItemCode": "LV_CFG_010",
+      "ItemName": "Leave Balance Display",
+      "ItemCategory": "Role",
+      "Description": "Displays available leave balance.",
+      "PlainLanguageDesc": "Shows how many leave days remain for each leave type.",
+      "IsMandatory": 0,
+      "DefaultValue": "",
+      "EstimatedHours": 3
+    },
+    {
+      "ItemCode": "LV_CFG_011",
+      "ItemName": "Leave Reason",
+      "ItemCategory": "BizTransaction",
+      "Description": "Reason for leave.",
+      "PlainLanguageDesc": "Users choose the reason for requesting leave.",
+      "IsMandatory": 1,
+      "DefaultValue": "",
+      "EstimatedHours": 2
+    },
+    {
+      "ItemCode": "LV_CFG_012",
+      "ItemName": "Remarks",
+      "ItemCategory": "DocumentFormat",
+      "Description": "Additional comments.",
+      "PlainLanguageDesc": "Allows users to provide more information about the leave request.",
+      "IsMandatory": 0,
+      "DefaultValue": "",
+      "EstimatedHours": 1
+    },
+    {
+      "ItemCode": "LV_CFG_013",
+      "ItemName": "Leave Detail Grid",
+      "ItemCategory": "BizTransaction",
+      "Description": "Displays detailed leave sessions.",
+      "PlainLanguageDesc": "Shows the individual leave entries and sessions.",
+      "IsMandatory": 1,
+      "DefaultValue": "",
+      "EstimatedHours": 5
+    }
+  ],
+
+  "Variants": [
+    {
+      "VariantCode": "LV_VAR_001",
+      "VariantName": "Employee Selection Mode",
+      "Description": "Different employee selection modes.",
+      "PlainLanguageDesc": "Screen changes depending on user role.",
+      "Options": [
+        "ERP Employee",
+        "ESS Functional",
+        "ESS Self",
+        "ESS Admin",
+        "ESS Site"
+      ],
+      "IsDefault": 1
+    },
+    {
+      "VariantCode": "LV_VAR_002",
+      "VariantName": "Quick Date",
+      "Description": "Shortcut date buttons.",
+      "PlainLanguageDesc": "Choose Yesterday, Today or Tomorrow.",
+      "Options": [
+        "Yesterday",
+        "Today",
+        "Tomorrow"
+      ],
+      "IsDefault": 1
+    }
+  ],
+
+  "UIControls": [
+    "Leave Number",
+    "ESS Leave Number",
+    "Leave Date",
+    "Reference Number",
+    "Reference Date",
+    "Leave Status",
+    "ERP Employee",
+    "ESS Functional Employee",
+    "ESS Self Employee",
+    "ESS Admin Employee",
+    "ESS Site Employee",
+    "Employee Code",
+    "Leave Type",
+    "Leave Type Code",
+    "From Date",
+    "To Date",
+    "Number Of Days",
+    "Yesterday Button",
+    "Today Button",
+    "Tomorrow Button",
+    "Leave Balance Grid",
+    "Reason",
+    "Remarks",
+    "Leave Detail Grid"
+  ],
+
+  "DisplayFields": [
+    "Employee Code",
+    "Leave Type Code",
+    "Leave Status",
+    "Leave Balance"
+  ],
+
+  "VisibilityRules": [
+    "TLeaveLeaveNumberRequired",
+    "TLeaveLeaveNumberRequiredESS",
+    "ErpEmployeePicklistRequired",
+    "EssFunctionalEmployeePicklistRequired",
+    "EssSelfEmployeePicklistRequired",
+    "EssAdminEmployeePicklistRequired",
+    "EssSiteEmployeePicklistRequired",
+    "LeaveSectionStatus"
+  ],
+
+  "ReadOnlyRules": [
+    "gbReadOnly",
+    "buttonreadonlyrequired"
+  ],
+
+  "Events": [
+    "OnPicklistChange",
+    "OnPicklistChanges",
+    "EmployeeNamFunction",
+    "LeaveTypeNameFunction",
+    "ReasonNameFunction",
+    "TLeaveRetrivalFunction",
+    "TLeaveDetailLeaveDateGet",
+    "TLeaveDetailValidTillGet",
+    "selectDate",
+    "TLeaveRemarksEvent",
+    "TLeaveDetailGridOutput",
+    "onLeaveSessionChanged"
+  ],
+
+  "DerivedFields": [
+    "Employee Code",
+    "Leave Type Code",
+    "Number Of Days",
+    "Leave Balance"
+  ],
+
+  "DetectedBusinessObjects": [
+    "Leave Request",
+    "Employee",
+    "Leave Type",
+    "Leave Balance",
+    "Leave Detail",
+    "Leave Session",
+    "Leave Status",
+    "Leave Reason",
+    "Reference Document",
+    "Business Transaction"
+  ],
+
+  "PendingBackendVerification": [
+    "Leave Balance Calculation",
+    "Leave Day Calculation",
+    "Workflow Approval Logic",
+    "Leave Validation Rules",
+    "Role Authorization",
+    "Payroll Integration",
+    "Leave Eligibility Rules"
+  ]
+}

@@ -1,0 +1,538 @@
+I am building a Product Intelligence Engine (PIE) for an ERP product.
+
+Your role:
+Act as an ERP Product Intelligence Analyst, Database Analyst, Business Analyst, Product Manager, and Sales Enablement Consultant.
+
+The objective is to convert raw database structures into structured product intelligence that can be understood by:
+1. Product Teams
+2. Development Teams
+3. Sales Teams
+4. Management Teams
+5. AI Knowledge Systems
+
+
+====================================================
+INPUT PROVIDED
+====================================================
+
+I will provide:
+
+- Database schema
+- Table structures
+- Column names
+- Data types
+- Length
+- Nullable information
+- Default values
+- Primary keys
+- Foreign keys
+- Constraints
+- Indexes (if available)
+
+Analyze only the information provided.
+
+Do not create unsupported functionality.
+
+If any functionality is assumed:
+- Mark it as "Inferred"
+- Mention the reason
+- Mention what additional source is required for confirmation
+
+
+====================================================
+PRIMARY OBJECTIVE
+====================================================
+
+Analyze the database structure and generate two outputs:
+
+OUTPUT 1:
+Complete PIE JSON Intelligence Output
+
+OUTPUT 2:
+Single Sheet Business Understanding Document
+
+
+====================================================
+OUTPUT 1: PIE JSON INTELLIGENCE FORMAT
+====================================================
+
+Generate JSON strictly in the following structure:
+
+
+{
+ "product_intelligence": {
+
+  "module_identification": {
+
+   "module_code": "",
+   "module_name": "",
+   "functional_area": "",
+   "erp_domain": "",
+   "source_type": "Database Schema Mining",
+   "tables_analyzed": []
+
+  },
+
+
+  "module_overview": {
+
+   "business_purpose": "",
+   "functional_description": "",
+   "business_problem_solved": "",
+   "primary_users": [],
+   "business_value": ""
+
+  },
+
+
+  "data_model_intelligence": {
+
+   "entities": [
+
+    {
+
+     "table_name": "",
+     "table_type": "",
+
+     "table_classification":
+     "Master / Transaction Header / Transaction Detail / Configuration / Reference",
+
+     "business_purpose": "",
+
+
+     "fields": [
+
+      {
+
+       "column_name": "",
+       "data_type": "",
+       "nullable": "",
+       "default_value": "",
+
+       "field_category":
+       "Primary Key / Foreign Key / Business Field / Status / Audit / Configuration / Calculation",
+
+       "technical_purpose": "",
+
+       "business_meaning": "",
+
+       "feature_relevance": "",
+
+       "user_impact": ""
+
+      }
+
+     ]
+
+    }
+
+   ]
+
+  },
+
+
+  "relationship_intelligence": {
+
+   "relationships": [
+
+    {
+
+     "parent_table": "",
+
+     "child_table": "",
+
+     "relationship_type": "",
+
+     "key_fields": "",
+
+     "business_meaning": ""
+
+    }
+
+   ]
+
+  },
+
+
+  "feature_intelligence": [
+
+   {
+
+    "feature_name": "",
+
+    "description": "",
+
+    "database_evidence": [],
+
+    "customer_value": "",
+
+    "sales_explanation": ""
+
+   }
+
+  ],
+
+
+  "business_rule_intelligence": [
+
+   {
+
+    "rule_name": "",
+
+    "business_rule": "",
+
+    "database_evidence": "",
+
+    "logic_type":
+    "Confirmed / Inferred",
+
+    "business_impact": ""
+
+   }
+
+  ],
+
+
+  "configuration_intelligence": [
+
+   {
+
+    "configuration_area": "",
+
+    "available_configuration": "",
+
+    "business_usage": ""
+
+   }
+
+  ],
+
+
+  "workflow_intelligence": {
+
+   "process_flow": [],
+
+   "workflow_logic": "",
+
+   "validation_required": ""
+
+  },
+
+
+  "user_role_intelligence": [
+
+   {
+
+    "role": "",
+
+    "possible_actions": []
+
+   }
+
+  ],
+
+
+  "reporting_intelligence": [
+
+   {
+
+    "report_name": "",
+
+    "purpose": "",
+
+    "possible_data_source": []
+
+   }
+
+  ],
+
+
+  "integration_intelligence": [
+
+   {
+
+    "integration_area": "",
+
+    "reason": "",
+
+    "related_fields_or_tables": []
+
+   }
+
+  ],
+
+
+  "audit_security_intelligence": {
+
+
+   "audit_fields": [],
+
+
+   "security_capabilities": [],
+
+
+   "multi_company_support": "",
+
+
+   "multi_tenant_support": ""
+
+  },
+
+
+  "sales_intelligence": {
+
+
+   "customer_value_proposition": "",
+
+
+   "demo_story": [],
+
+
+   "key_selling_points": [],
+
+
+   "competitive_comparison_points": [],
+
+
+   "customer_problem_solved": ""
+
+  },
+
+
+  "data_gap_analysis": [
+
+   {
+
+    "missing_information": "",
+
+    "why_required": "",
+
+    "recommended_source":
+
+    "Screenshot / Code / Document / Support Ticket / Related Table"
+
+   }
+
+  ],
+
+
+  "confidence_analysis": {
+
+
+   "confirmed_information": [],
+
+
+   "inferred_information": [],
+
+
+   "requires_validation": []
+
+  }
+
+
+ }
+
+}
+
+
+
+====================================================
+ANALYSIS RULES
+====================================================
+
+
+1. FIELD LEVEL ANALYSIS
+
+Every database column must be analyzed.
+
+For every field identify:
+
+- Technical purpose
+- Business meaning
+- Feature relevance
+- User impact
+
+
+Example:
+
+Database Field:
+
+ISENCASHABLE
+
+
+Technical:
+
+Boolean configuration field
+
+
+Business Meaning:
+
+Controls whether unused leave can be converted into monetary benefit.
+
+
+Feature:
+
+Leave Encashment
+
+
+User Impact:
+
+Employee may receive payment for unused leave.
+
+
+----------------------------------------------------
+
+
+2. IDENTIFY ERP DESIGN PATTERNS
+
+Identify:
+
+- Master data
+- Transaction header
+- Transaction details
+- Configuration tables
+- Reference tables
+- Status management
+- Audit tracking
+- Formula-based processing
+- Multi organization support
+- Multi tenant architecture
+
+
+----------------------------------------------------
+
+
+3. EXTRACT MAXIMUM INTELLIGENCE
+
+Identify:
+
+- Product features
+- Automation capability
+- Workflow capability
+- Approval capability
+- Calculation capability
+- Tracking capability
+- Reporting capability
+- Integration possibilities
+
+
+----------------------------------------------------
+
+
+4. BUSINESS RULE EXTRACTION
+
+Extract rules from:
+
+- Default values
+- Constraints
+- Status fields
+- Boolean fields
+- Formula references
+- Date fields
+- Calculation fields
+
+
+For every rule mention:
+
+- Rule
+- Evidence
+- Confirmed or Inferred
+- Business impact
+
+
+----------------------------------------------------
+
+
+5. DO NOT HALLUCINATE
+
+Do not create:
+
+- Missing workflows
+- Missing screens
+- Missing approvals
+- Missing integrations
+
+If information is unavailable:
+
+Mention:
+
+"Requires additional analysis from code/screenshots/documents"
+
+
+====================================================
+OUTPUT 2: BUSINESS UNDERSTANDING DOCUMENT
+====================================================
+
+Convert the JSON intelligence into ONE SINGLE COPYABLE TABLE.
+
+Do not create multiple tables.
+
+Format:
+
+
+| Intelligence Category | Business Understanding |
+|---|---|
+
+
+Include:
+
+
+- Module Name
+- Functional Area
+- Purpose
+- Business Problem Solved
+- Users
+- Core Workflow
+- Features Available
+- Configuration Options
+- Employee Experience
+- Manager Experience
+- Admin Experience
+- Automation Capability
+- Business Rules
+- Reports Possible
+- Integration Possibilities
+- Audit Capability
+- Security Capability
+- Customer Benefits
+- Sales Explanation
+- Demo Story
+- Competitive Advantage Areas
+- Additional Information Required
+
+
+====================================================
+LARGE MODULE HANDLING
+====================================================
+
+If the input contains more than 20 tables:
+
+Process in this order:
+
+1. Module Overview
+2. Table Classification
+3. Entity Intelligence
+4. Relationship Mapping
+5. Feature Extraction
+6. Business Understanding
+
+
+====================================================
+FINAL THINKING APPROACH
+====================================================
+
+Think from three perspectives:
+
+PRODUCT MANAGER:
+"What capability does this ERP module provide?"
+
+SALES CONSULTANT:
+"How can I explain this capability to a customer?"
+
+AI KNOWLEDGE ENGINE:
+"What structured intelligence should be stored for future use?"
+
+
+Now analyze the following database schema:
+
+[PASTE DATABASE TABLE STRUCTURE HERE]

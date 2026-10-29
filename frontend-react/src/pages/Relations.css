@@ -1,0 +1,79 @@
+/* Relationships page. Colours come only from the shared theme variables. */
+.rel-page { max-width: 1600px; }
+.rel-page .small { font-size: 12px; }
+.rel-page .nowrap { white-space: nowrap; }
+.rel-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .rel-layout { grid-template-columns: 1fr; } }
+
+/* screen list */
+.rel-list { padding: 0; position: sticky; top: 12px; max-height: calc(100vh - var(--topbar) - 40px); display: flex; flex-direction: column; min-width: 0; }
+@media (max-width: 900px) { .rel-list { position: static; max-height: 380px; } }
+.rel-filters { padding: 12px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.rel-filters .search { display: flex; }
+.rel-filters .mp, .rel-filters .mp-btn { display: flex; width: 100%; max-width: none; }
+.rel-filters .mp-label { flex: 1; text-align: left; }
+.rel-slist { overflow: auto; padding: 4px 6px 8px; }
+.rel-slist > button { display: block; width: 100%; text-align: left; border: 0; background: none; border-radius: 7px; padding: 6px 8px; cursor: pointer; font-size: 13.5px; }
+.rel-slist > button:hover { background: var(--surface-2); }
+.rel-slist > button[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.rel-slist small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 400; }
+.rel-grp { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); padding: 10px 8px 2px; font-weight: 650; }
+
+/* main panels */
+.rel-main { min-width: 0; }
+.rel-panel { margin-bottom: 16px; min-width: 0; }
+.rel-panel h3 { font-size: 15px; margin: 0 0 10px; }
+.rel-h3gap { margin-top: 18px !important; }
+.rel-title { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.rel-title h2 { font-size: 18px; margin: 0; overflow-wrap: anywhere; }
+.rel-title h2 .muted { font-weight: 400; font-size: 13px; }
+.rel-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.rel-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+.rel-legend { display: flex; gap: 8px 16px; flex-wrap: wrap; align-items: center; font-size: 12.5px; color: var(--muted); margin: 6px 0 12px; }
+.rel-legend i { display: inline-block; width: 22px; height: 0; border-top: 2px solid var(--muted); vertical-align: middle; margin-right: 4px; }
+.rel-legend i.cand { border-top-style: dashed; }
+.rel-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 16px; }
+.rel-ev { font-size: 11.5px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+.rel-ev code { font-size: 11px; }
+.rel-ev .chip { margin-left: 4px; }
+.rel-evline { margin-bottom: 5px; }
+.rel-ep + .rel-ep { margin-top: 8px; }
+.rel-route { overflow-wrap: anywhere; }
+.rel-table td .chip { margin: 0 4px 2px 0; }
+.rel-table code { word-break: normal; }
+.rel-table td:last-child code, .rel-table td:first-child code { word-break: break-all; }
+.rel-table tr.hl td { background: var(--accent-soft); }
+.rel-linkish { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; text-align: left; font-size: inherit; }
+
+/* knowledge groups */
+.rel-kn details { border-bottom: 1px solid var(--border); padding: 5px 0; }
+.rel-kn summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; }
+.rel-kn summary::-webkit-details-marker { display: none; }
+.rel-caret { color: var(--muted); transition: transform 0.15s; flex: none; }
+.rel-kn details[open] .rel-caret { transform: rotate(90deg); }
+.rel-kn ul { margin: 6px 0 4px; padding-left: 24px; font-size: 13px; }
+.rel-kn li { margin: 3px 0; }
+.rel-kn li .chip { margin-left: 4px; }
+
+/* the chain diagram */
+.rel-diagram { overflow-x: auto; padding-bottom: 4px; }
+.rel-cols { position: relative; display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 56px; min-width: 820px; padding: 4px 2px; }
+.rel-col { position: relative; z-index: 1; min-width: 0; }
+.rel-col h4 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.rel-node { --c: var(--accent); display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--c); border-radius: 8px; padding: 6px 9px; margin-bottom: 8px; font-size: 12.5px; cursor: pointer; transition: opacity 0.15s, box-shadow 0.15s; }
+.rel-node b { display: block; overflow-wrap: anywhere; }
+.rel-node small { display: block; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+.rel-node.screen { --c: var(--accent); }
+.rel-node.api { --c: var(--ok); }
+.rel-node.backend { --c: var(--muted); }
+.rel-node.table { --c: var(--warn); }
+.rel-node.pinned { background: var(--surface-2); }
+.rel-ops { float: right; font-size: 10.5px; font-weight: 700; color: var(--warn); margin-left: 6px; }
+.rel-diagram.focus .rel-node { opacity: 0.3; }
+.rel-diagram.focus .rel-node.on { opacity: 1; box-shadow: 0 0 0 2px var(--c); }
+.rel-wires { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; z-index: 0; }
+.rel-wires path { fill: none; stroke: var(--muted); stroke-opacity: 0.5; stroke-width: 1.4; }
+.rel-wires path.cand { stroke-dasharray: 5 4; }
+.rel-diagram.focus .rel-wires path { stroke-opacity: 0.1; }
+.rel-diagram.focus .rel-wires path.on { stroke-opacity: 1; stroke: var(--accent); stroke-width: 2; }
+@media (prefers-reduced-motion: reduce) { .rel-node, .rel-caret { transition: none; } }

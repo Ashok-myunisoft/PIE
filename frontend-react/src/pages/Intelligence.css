@@ -1,0 +1,24 @@
+/* Department Knowledge page. Colours come only from the shared theme variables. */
+.intel-page .small { font-size: 12px; }
+.intel-page > .note { margin-bottom: 14px; }
+.intel-status { margin-bottom: 14px; }
+.intel-controls { display: grid; grid-template-columns: 220px 220px minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+.intel-controls .search { display: flex; }
+.intel-controls select { width: 100%; text-transform: capitalize; }
+@media (max-width: 750px) { .intel-controls { grid-template-columns: 1fr; } }
+.intel-purpose { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); margin: 0 0 12px; }
+.intel-purpose svg { flex: none; margin-top: 3px; }
+.intel-purpose b { color: var(--text); }
+.intel-actions { margin-bottom: 12px; }
+.intel-context { margin-bottom: 14px; }
+.intel-context summary { cursor: pointer; font-weight: 600; }
+.intel-context pre, .intel-evidence pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); font-size: 12px; background: var(--surface-2); padding: 12px; border-radius: 8px; max-height: 420px; overflow: auto; margin: 8px 0 0; }
+.intel-results { display: flex; flex-direction: column; gap: 14px; }
+.intel-record h2 { font-size: 17px; margin: 0 0 8px; }
+.intel-tags { display: flex; gap: 6px; flex-wrap: wrap; text-transform: capitalize; }
+.intel-meta { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; margin: 8px 0 10px; }
+.intel-content { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.intel-evidence { margin-top: 12px; }
+.intel-evidence summary { cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 550; }
+.intel-more { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.intel-foot { margin-top: 28px; }

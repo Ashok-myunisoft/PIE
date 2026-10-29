@@ -1,0 +1,59 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+outputs/*
+!outputs/golden/
+
+# =========================
+# Python
+# =========================
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+pie.env
+htpasswd
+
+# =========================
+# Test / Cache
+# =========================
+.pytest_cache/
+.q2_test/
+.qdrant_int_test/
+**/.int_cache/
+**/.qdrant_int_cache/
+**/*pytest-cache*/
+**/.cache/
+
+# =========================
+# Generated Outputs
+# =========================
+outputs/*
+!outputs/golden/
+backend/outputs/
+
+# =========================
+# ERP source code (local input for the pipeline; never uploaded)
+# =========================
+data/erp/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db

@@ -1,0 +1,161 @@
+1. Configuration → PIEConfigItemDTO[]
+
+[
+{
+    "ConfigItemName": "Leave Type Configuration",
+    "Description": "Leave types must be predefined in system for selection during leave application",
+    "IsMandatory": true,
+    "Module": "Payroll & Attendance",
+    "needsReview": true
+  },
+  {
+    "ConfigItemName": "Leave Balance Setup",
+    "Description": "Employee leave balance must be configured to allow leave application",
+    "IsMandatory": true,
+    "Module": "Payroll & Attendance",
+    "needsReview": true
+  },
+  {
+    "ConfigItemName": "Approval Workflow Setup",
+    "Description": "Leave approval hierarchy must be configured for processing leave requests",
+    "IsMandatory": true,
+    "Module": "HRMS",
+    "needsReview": true
+  }
+
+2. Process / Training → PIETrainingTopicDTO[]
+
+
+[
+  {
+    "TopicName": "Login to ESS Portal",
+    "TopicCategory": "Transaction",
+    "MenuPath": "Login",
+    "Steps": [
+      "Open ESS login URL",
+      "Enter username and password",
+      "Click Sign In"
+    ],
+    "needsReview": false
+  },
+  {
+    "TopicName": "Navigate to Leave Application Screen",
+    "TopicCategory": "Transaction",
+    "MenuPath": "Leave/Onduty (Daywise)",
+    "Steps": [
+      "Login to ESS",
+      "Locate Leave/Onduty (Daywise) menu",
+      "Click to open leave application screen"
+    ],
+    "needsReview": false
+  },
+  {
+    "TopicName": "Apply Leave Request",
+    "TopicCategory": "Transaction",
+    "MenuPath": "Leave/Onduty (Daywise)",
+    "Steps": [
+      "Select leave type",
+      "Choose leave dates",
+      "Enter reason (if applicable)",
+      "Submit leave request"
+    ],
+    "needsReview": true
+  },
+  {
+    "TopicName": "View Leave Summary",
+    "TopicCategory": "Report",
+    "MenuPath": "Leave/Onduty Summary",
+    "Steps": [
+      "Navigate to Leave Summary",
+      "Review applied leave status",
+      "Check approval/rejection details"
+    ],
+    "needsReview": false
+  }
+]
+
+
+3. UAT / Exercise Scenarios → PIEUATScenarioDTO[]
+
+
+[
+  {
+    "ScenarioName": "Apply Leave Successfully",
+    "Steps": [
+      "Login to ESS portal",
+      "Navigate to Leave/Onduty (Daywise)",
+      "Enter valid leave details",
+      "Submit request",
+      "Verify submission confirmation"
+    ],
+    "ExpectedResult": "Leave request is submitted successfully",
+    "needsReview": true
+  },
+  {
+    "ScenarioName": "Apply Leave Without Mandatory Fields",
+    "Steps": [
+      "Login to ESS portal",
+      "Navigate to Leave application",
+      "Leave required fields empty",
+      "Click submit"
+    ],
+    "ExpectedResult": "System should show validation error",
+    "needsReview": true
+  },
+  {
+    "ScenarioName": "View Leave in Summary",
+    "Steps": [
+      "Submit leave request",
+      "Navigate to Leave Summary",
+      "Search for submitted leave"
+    ],
+    "ExpectedResult": "Leave record should appear with correct status",
+    "needsReview": false
+  },
+  {
+    "ScenarioName": "Apply Leave Beyond Balance",
+    "Steps": [
+      "Login to ESS",
+      "Apply leave exceeding balance",
+      "Submit request"
+    ],
+    "ExpectedResult": "System should restrict or warn user",
+    "needsReview": true
+  }
+]
+
+
+4. Estimation → PIEEstimationRuleDTO[]
+
+
+[
+  {
+    "Feature": "Leave Application - Basic Setup",
+    "BaseHours": 0.30,
+    "EngagementType": "Standard",
+    "ComplexityLevel": "Simple",
+    "needsReview": true
+  },
+  {
+    "Feature": "Leave Workflow Configuration",
+    "BaseHours": 3,
+    "EngagementType": "Configure",
+    "ComplexityLevel": "Medium",
+    "needsReview": true
+  },
+  {
+    "Feature": "Custom Leave Policies & Rules",
+    "BaseHours": 4,
+    "EngagementType": "Custom",
+    "ComplexityLevel": "Complex",
+    "needsReview": true
+  },
+  {
+    "Feature": "HRMS Leave Application Training",
+    "BaseHours": 2,
+    "EngagementType": "Standard",
+    "ComplexityLevel": "Simple",
+    "needsReview": false
+  }
+]
+

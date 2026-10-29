@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIE Product Intelligence</title>
+<meta name="description" content="PIE: evidence-backed product knowledge for GoodBooks ERP. Ask questions, browse features and explore every field.">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#dfe3e8; --text:#17202a; --muted:#5b6673;
+  --accent:#2457d6; --accent-soft:#e7eefc; --ok:#1f7a4d; --ok-soft:#e3f4ea; --bad:#a33a2b; --warn:#9a5b00; --warn-soft:#fdf1dc;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --radius:12px; --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+    --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --bad:#f08a78; --warn:#f0b44c; --warn-soft:#352812; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+  --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --bad:#f08a78; --warn:#f0b44c; --warn-soft:#352812; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.55 var(--font);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header.top{background:var(--surface);border-bottom:1px solid var(--border)}
+.top-inner{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;margin-right:8px}
+.brand b{font-size:16px}.brand span{color:var(--muted);font-size:12px}
+.appnav{display:flex;gap:2px;flex-wrap:wrap;margin-right:auto}
+.appnav a{padding:6px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500;font-size:14px}
+.appnav a:hover{background:var(--surface-2);color:var(--text)}
+.appnav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.btn{color:var(--text);border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 11px;cursor:pointer}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 40px}
+.hero{margin-bottom:22px}
+.hero h1{font-size:28px;line-height:1.2;margin:0 0 8px}
+.hero p{color:var(--muted);max-width:760px;margin:0}
+.status{display:flex;gap:18px;flex-wrap:wrap;margin:16px 0 26px;font-size:13px;color:var(--muted)}
+.status b{color:var(--text)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);margin-right:6px;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.off{background:var(--bad)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:border-color .15s}
+.card:hover{border-color:var(--accent)}
+.card .kicker{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.card h2{margin:0;font-size:20px}
+.card p{margin:0;color:var(--muted)}
+.card .facts{display:flex;gap:14px;flex-wrap:wrap;margin-top:auto;padding-top:10px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+.card .facts b{color:var(--text);font-size:18px;display:block}
+.card .go{color:var(--accent);font-weight:600}
+.how{margin-top:32px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.how h3{margin:0 0 10px;font-size:15px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;font-size:13px;color:var(--muted)}
+.steps b{display:block;color:var(--text);margin-bottom:2px}
+.policy{margin-top:16px;font-size:13px;color:var(--muted)}
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><b>PIE</b><span>Product Intelligence · GoodBooks ERP</span></div>
+    <nav class="appnav" id="appnav" aria-label="PIE pages"><a href="index.html" aria-current="page">Home</a><a href="chat.html">Ask PIE</a><a href="catalog.html">Feature Catalog</a><a href="fields.html">Field Explorer</a><a href="relations.html">Relationships</a><a href="logs.html">Activity Log</a><a href="intelligence.html">Department Knowledge</a></nav>
+    <button class="btn" id="theme" type="button" aria-label="Toggle colour theme">◐</button>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <h1>Evidence-backed knowledge about GoodBooks ERP</h1>
+    <p>PIE reads the ERP's frontend, backend and database, and turns them into knowledge you can ask about, browse and share. Every statement links back to where it came from.</p>
+  </section>
+  <div class="status" id="status" aria-live="polite"><span><span class="dot"></span>Checking the knowledge base…</span></div>
+
+  <div class="cards">
+    <a class="card" href="chat.html">
+      <span class="kicker">Ask</span>
+      <h2>Ask PIE</h2>
+      <p>Ask in plain English about features, industries, demo flows, differentiators, gaps, tickets or individual fields. Answers cite their sources.</p>
+      <div class="facts" id="facts-chat"><span><b>—</b>knowledge items</span><span><b>—</b>AI</span></div>
+      <span class="go">Open the chat →</span>
+    </a>
+    <a class="card" href="catalog.html">
+      <span class="kicker">Browse</span>
+      <h2>Feature Catalog</h2>
+      <p>Marketing-ready feature lists by capability, with verified highlights, readiness and a CSV feature sheet.</p>
+      <div class="facts" id="facts-catalog"><span><b>—</b>features</span><span><b>—</b>marketing-ready</span></div>
+      <span class="go">Open the catalog →</span>
+    </a>
+    <a class="card" href="fields.html">
+      <span class="kicker">Explore</span>
+      <h2>Field Explorer</h2>
+      <p>Every field of a screen: type, allowed values, validations and messages, dependencies, formulas, database and code mapping, usage and evidence.</p>
+      <div class="facts" id="facts-fields"><span><b>—</b>fields</span><span><b>—</b>screens</span></div>
+      <span class="go">Open the explorer →</span>
+    </a>
+    <a class="card" href="relations.html">
+      <span class="kicker">Trace</span>
+      <h2>Relationships</h2>
+      <p>How each screen connects to APIs, backend services and database tables, with the evidence behind every link and the PIE knowledge held for the screen.</p>
+      <span class="go">Open relationships →</span>
+    </a>
+    <a class="card" href="logs.html">
+      <span class="kicker">Operate</span>
+      <h2>Activity Log</h2>
+      <p>Every discovery, mapping, Qdrant ingestion and question: status, counts, errors, and how each answer was reached.</p>
+      <span class="go">Open the log →</span>
+    </a>
+  </div>
+
+  <section class="how">
+    <h3>How PIE builds its knowledge</h3>
+    <div class="steps">
+      <div><b>1 · Discover</b>Screens, forms, APIs, services and database objects from the ERP source.</div>
+      <div><b>2 · Map</b>Screen → API → business logic → SQL → tables, with file and line evidence.</div>
+      <div><b>3 · Explain</b>AI writes explanations from the extracted facts only, labelled as AI-derived.</div>
+      <div><b>4 · Store</b>Everything is kept in the Qdrant knowledge base that the chat searches.</div>
+    </div>
+    <p class="policy">Verified facts come straight from the sources. AI-derived text and anything marked “needs review” should be checked with product before external use.</p>
+  </section>
+</main>
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  // Backend address: an exported file's embedded setting, else frontend/config.js.
+  const API = (b => b && !b.endsWith("/") ? b + "/" : b)((window.__PIE_CHAT__ && window.__PIE_CHAT__.apiBase) || (window.PIE_CONFIG && window.PIE_CONFIG.apiBase) || "");
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  try{ const t = localStorage.getItem("pie-home:theme"); if (t) document.documentElement.setAttribute("data-theme", JSON.parse(t)); }catch(e){}
+  $("theme").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = cur === "dark" ? "light" : "dark"; document.documentElement.setAttribute("data-theme", next);
+    try{ localStorage.setItem("pie-home:theme", JSON.stringify(next)); }catch(e){}
+  });
+  const facts = (id, pairs) => { $(id).innerHTML = pairs.map(([v, l]) => `<span><b>${esc(v)}</b>${esc(l)}</span>`).join(""); };
+  if (!API){
+    $("status").innerHTML = `<span><span class="dot off"></span>No backend address is configured. Set apiBase in frontend/config.js (for example http://localhost:8000/usage/).</span>`;
+    return;
+  }
+  const get = u => fetch(u).then(r => r.ok ? r.json() : Promise.reject(new Error(r.status)));
+  Promise.allSettled([get(API + "api/chat/status"), get(API + "api/modules"), get(API + "api/fields")]).then(([st, mods, flds]) => {
+    const parts = [];
+    if (st.status === "fulfilled"){
+      const s = st.value;
+      parts.push(`<span><span class="dot ok"></span>Qdrant <b>${esc(s.collection)}</b>: <b>${esc(s.points.toLocaleString())}</b> knowledge items</span>`);
+      parts.push(`<span>Verified modules: <b>${esc(s.verifiedModules.join(", ") || "none")}</b></span>`);
+      parts.push(`<span>Field knowledge: <b>${esc((s.byType || {}).FieldKnowledge || 0)}</b> fields</span>`);
+      parts.push(`<span>Tickets: <b>${esc(s.tickets)}</b></span><span>AI: <b>${esc(s.llm)}</b></span>`);
+      facts("facts-chat", [[s.points.toLocaleString(), "knowledge items"], [s.llm, "AI"]]);
+    } else {
+      parts.push(`<span><span class="dot off"></span>Backend not reachable at <b>${esc(API)}</b>. Start it with start_backend.ps1 (${esc(st.reason.message)})</span>`);
+    }
+    if (mods.status === "fulfilled" && mods.value.length){
+      const f = mods.value.reduce((a, m) => a + (m.statistics.features || 0), 0), r = mods.value.reduce((a, m) => a + (m.statistics.ready || 0), 0);
+      facts("facts-catalog", [[f, "features"], [r, "marketing-ready"], [mods.value.map(m => m.moduleName).join(", "), "modules"]]);
+    }
+    if (flds.status === "fulfilled" && flds.value.length){
+      const n = flds.value.reduce((a, d) => a + (d.statistics.fields || 0), 0);
+      facts("facts-fields", [[n, "fields"], [flds.value.map(d => d.screenName).join(", "), flds.value.length === 1 ? "screen" : "screens"]]);
+    }
+    $("status").innerHTML = parts.join("");
+  });
+})();
+</script>
+</body>
+</html>

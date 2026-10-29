@@ -1,0 +1,289 @@
+1. Get All Leave Details
+
+URL : /prs/All/Leave/Details/?FirstNumber=-1&MaxResult=-1
+METHOD : POST
+PARAMETER : FirstNumber, MaxResult
+BODY : {}
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": true,
+  "Message": "Success",
+  "Data": [
+    {
+      "LeaveId": 1,
+      "LeaveCode": "CL",
+      "LeaveName": "Casual Leave",
+      "LeaveIsEncashable": 0,
+      "LeaveIsEncashableName": "No",
+      "LeaveIsBalanceMaintained": 1,
+      "LeaveIsBalanceMaintainedName": "Yes",
+      "LeaveIsCarriedOver": 0,
+      "LeaveIsCarriedOverName": "No",
+      "LeaveCreditMethod": 1,
+      "LeaveCreditMethodName": "Monthly",
+      "LeaveLeaveType": 1,
+      "LeaveLeaveTypeName": "Casual",
+      "LeaveLeaveSalaryPercent": 100.0,
+      "LeaveIncludeHoliday": 0,
+      "LeaveIncludeHolidayName": "No",
+      "LeaveSurroundingDay": 0,
+      "LeaveSurroundingDayName": "No",
+      "LeaveIsApplicable": 1,
+      "LeaveSortOrder": 1,
+      "LeaveStatus": 1,
+      "LeaveVersion": 1
+    }
+  ]
+}
+2. Delete Leave
+
+URL : /prs/Leave/DeleteLeave/?LeaveId={LeaveId}
+METHOD : DELETE
+PARAMETER : LeaveId
+BODY : NULL
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": 200,
+  "Message": "Details Deleted Successfully"
+}
+3. Get Leave
+
+URL : /prs/Leave/GetLeave/?LeaveId={LeaveId}
+METHOD : GET
+PARAMETER : LeaveId
+BODY : NULL
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": 200,
+   "Body": {
+    "LeaveId": 1,
+    "LeaveCode": "CL",
+    "LeaveName": "Casual Leave",
+    "LeaveIsEncashable": 0,
+    "LeaveIsBalanceMaintained": 1,
+    "LeaveIsCarriedOver": 0,
+    "LeaveCreditMethod": 1,
+    "LeaveLeaveType": 1,
+    "LeaveLeaveSalaryPercent": 100.0,
+    "LeaveIncludeHoliday": 0,
+    "LeaveSurroundingDay": 0,
+    "LeaveIsApplicable": 1,
+    "LeaveCreditFormulaId": 2,
+    "LeaveCreditFormulaCode": "CF001",
+    "LeaveSalaryFormulaId": 3,
+    "LeaveSalaryFormulaCode": "SF001",
+    "LeaveDisplayCode": "CL",
+    "LeaveIsTrackingRequired": 1,
+    "LeaveSortOrder": 1,
+    "LeaveStatus": 1,
+    "LeaveVersion": 1
+  }
+}
+4. Get Leave Balance
+
+URL : /prs/Leave/GetLeaveBalance/?PeriodFrom={PeriodFrom}&PeriodTo={PeriodTo}
+METHOD : GET
+PARAMETER : PeriodFrom, PeriodTo
+BODY : NULL
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": 200,
+   "Data": [
+    {
+      "EmployeeId": 101,
+      "EmployeeCode": "EMP001",
+      "EmployeeName": "John Doe",
+      "LeaveTypeId": 1,
+      "LeaveTypeCode": "CL",
+      "LeaveTypeName": "Casual Leave",
+      "LeaveBalance": 5.5,
+      "TAvailabeLeave": "5.5"
+    }
+  ]
+}
+5. Get Leave Balance Based On Usercode
+
+URL : /prs/Leave/GetLeaveBalanceBasedOnUsercode/?PeriodFrom={PeriodFrom}&PeriodTo={PeriodTo}
+METHOD : GET
+PARAMETER : PeriodFrom, PeriodTo
+BODY : NULL
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": 200,
+    "Data": [
+    {
+      "EmployeeCode": "EMP001",
+      "EmployeeName": "John Doe",
+      "LeaveTypeCode": "CL",
+      "LeaveTypeName": "Casual Leave",
+      "LeaveBalance": 5.5
+    }
+  ]
+}
+6. Get SelectList MLeave
+
+URL : /prs/Leave/GetSelectListMLeave/?FirstNumber=-1&MaxResult=-1
+METHOD : GET
+PARAMETER : FirstNumber, MaxResult
+BODY : {}
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": true,
+  "Message": "Success",
+  "Data": [
+    {
+      "Id": 1,
+      "Code": "CL",
+      "Name": "Casual Leave"
+    },
+    {
+      "Id": 2,
+      "Code": "SL",
+      "Name": "Sick Leave"
+    }
+  ]
+}
+7. Leave Status Report
+
+URL : /prs/Leave/LeaveStatusReport/?FirstNumber=-1&MaxResult=-1
+METHOD : GET
+PARAMETER : FirstNumber, MaxResult
+BODY : NULL
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": 200,
+  "Data": [
+    {
+      "TLeaveId": 501,
+      "EmployeeCode": "EMP001",
+      "EmployeeName": "John Doe",
+      "OUCode": "OU01",
+      "OUName": "Head Office",
+      "PeriodCode": "2026-07",
+      "PeriodName": "July 2026",
+      "TLeaveLeaveNumber": "LV/2026/501",
+      "TLeaveLeaveDate": "2026-07-20",
+      "TLeaveReferenceNumber": "REF501",
+      "TLeaveReferenceDate": "2026-07-20",
+      "TLeaveRemarks": "Family function",
+      "TLeaveNumberOfDays": 2,
+      "TLeaveStatus": 1,
+      "ReasonCode": "R01",
+      "ReasonName": "Personal"
+    }
+  ]
+}
+8. Save Leave
+
+URL : /prs/Leave/SaveLeave
+METHOD : POST
+PARAMETER : NULL
+BODY : SAVE POSTBODYJSON
+{
+  "LeaveId": 0,
+  "LeaveCode": "CL",
+  "LeaveName": "Casual Leave",
+  "LeaveIsEncashable": 0,
+  "LeaveIsBalanceMaintained": 1,
+  "LeaveIsCarriedOver": 0,
+  "LeaveCreditMethod": 1,
+  "LeaveLeaveType": 1,
+  "LeaveLeaveSalaryPercent": 100.0,
+  "LeaveIncludeHoliday": 0,
+  "LeaveSurroundingDay": 0,
+  "LeaveIsApplicable": 1,
+  "LeaveCreditFormulaId": 2,
+  "LeaveSalaryFormulaId": 3,
+  "LeaveDisplayCode": "CL",
+  "LeaveIsTrackingRequired": 1,
+  "LeaveSortOrder": 1,
+  "LeaveStatus": 1,
+  "LeaveVersion": 1
+}
+HEADER : LOGINDTO
+RESPONSE :
+
+json
+{
+  "Status": 200,
+  "Message": "Details Saved Successfully"
+}
+
+(On update: "Message": "Details Updated Successfully")
+
+TLEAVE SAVE SAMPLE POST DATA : 
+Sample POST Body (TLeaveDTO with TLeaveDetailDTO array) :
+
+json
+{
+  "TLeaveId": -1,
+  "EmployeeCode": "EMP001",
+  "EmployeeName": "John Doe",
+  "OUId": 1,
+  "PeriodId": 5,
+  "BizTransactionTypeId": 2,
+  "TLeaveLeaveNumber": "",
+  "TLeaveLeaveDate": "2026-07-24",
+  "TLeaveReferenceNumber": "REF501",
+  "TLeaveReferenceDate": "2026-07-24",
+  "TLeaveRemarks": "Family function",
+  "TLeaveNumberOfDays": 2,
+  "ReasonId": 1,
+  "TLeaveDetailArray": [
+    {
+      "TLeaveDetailId": -1,
+      "TLeaveId": -1,
+      "TLeaveDetailSlNo": 1,
+      "EmployeeId": 101,
+      "LeaveTypeId": 1,
+      "TLeaveDetailLeaveDate": "2026-07-25",
+      "TLeaveDetailValidTill": "2026-07-25",
+      "TLeaveDetailNumberOfDays": 1,
+      "TLeaveDetailLeaveStatus": 1,
+      "TLeaveDetailLeaveDayType": 1,
+      "FromDate": "2026-07-25",
+      "ToDate": "2026-07-25"
+    },
+    {
+      "TLeaveDetailId": -1,
+      "TLeaveId": -1,
+      "TLeaveDetailSlNo": 2,
+      "EmployeeId": 101,
+      "LeaveTypeId": 1,
+      "TLeaveDetailLeaveDate": "2026-07-26",
+      "TLeaveDetailValidTill": "2026-07-26",
+      "TLeaveDetailNumberOfDays": 1,
+      "TLeaveDetailLeaveStatus": 1,
+      "TLeaveDetailLeaveDayType": 1,
+      "FromDate": "2026-07-26",
+      "ToDate": "2026-07-26"
+    }
+  ]
+}
+
+
+Login DTO : 
+
+
+{"AdminRights":0,"CounterOperationId":-1,"UserCode":"VV","DatabaseName":"Unisoftgb4","SessionId":0,"ValidToTime":"MDYvMDMvMjAyNiAwOToxNzo0Nw==","ValidityOfSession":"LTE0OTk5OTk5MzgwLTE3OTk5OTk5NzgtMS0xaHR0cDovL2xvY2FsaG9zdDo1MDAwLTE=","UserId":-1499999938,"UserPrimaryMailId":"joswa@myunisoft.com","ServerId":0,"RoleId":-1799999978,"AppId":-1,"DeviceId":-1,"WorkOUId":-1500000000,"WorkPeriodId":-1499999986,"WorkPartyBranchId":-1,"WorkStoreId":-1,"Realm":"Private Data","ImgPath":"../images/user/","ModeOfOperation":0,"MachineIP":"192.168.0.1","UserName":"VenkatesanVasudevan","TimeZone":330,"DatabaseOffset":120,"DatabaseType":0,"UserCriteriaConfigId":-1,"ClientId":-1399999958,"SourceType":5,"StartTime":"35124746","DateFormat":"dd/MM/yyyy","CurrencyFormat":"#,##,##,##0.00","TimeFormat":"HH:MM","QuantityFormat":"###0.00","FromMailMenuId":"-1","FromMailvalueId":"-1","FEUri":"/fws/UserService/AuthenticateUser","IsAdmin":false,"ServerConfigId":-1399999765,"ModeOfWorking":0,"BaseUri":"43.252.94.60:98","Geo":null,"LoginServerDate":"2026-06-03T09:17:47.650724+02:00","LoginEventLogId":1055139,"ServerMachineName":"LINUX","ServerName":"UNISOFT OFF","ServerIP":"217.216.78.142","ServerUniqueDetails":"00:22:4D:AF:F4:94","ServerPopup":"","WorkFinanceBookId":-1,"OuCode":"UNISOFT","OuName":"UNISOFT","SelectlistOperationType":6,"LastLoginUsedTime":"MDYvMDMvMjAyNiAwOToxNzo0Nw==","ExpiryTime":480,"GraceTime":15,"ServerConfigOffset":0,"ServerConfigMaxValue":0,"TimeZoneId":91,"TimeZoneDisplayName":"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi","ServiceOffSet":120,"FinalOffSetValue":450,"FETIMEZONEOFFSET":-330,"IsIpBasedCheckingRequired":1,"IsForcePasswordChange":1,"Delimiter":",","ReportBaseUri":"","FEVersion":4.5,"LanguageId":"","AttachmentOption":2,"BaseURL":"http://43.252.94.60:98/gb4","TempBaseURI":"http://43.252.94.60:98/gb4","IsValidationRequired":1,"KeycloakUrl":"http://localhost:5000/Keycloak/KeyCloakAuthenticateUser","GB5Enabled":0}

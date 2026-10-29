@@ -1,0 +1,153 @@
+# Test -> build the two Docker images -> push to GitHub Container Registry -> deploy to the
+# Contabo server over SSH. Runs on every push to main, or by hand (Actions -> Run workflow).
+#
+# Repository settings -> Secrets and variables -> Actions:
+#   Secrets    DEPLOY_HOST      217.217.249.121
+#              DEPLOY_USER      SSH user on the server (must be able to run docker)
+#              DEPLOY_SSH_KEY   private key for that user (whole file, including BEGIN/END lines)
+#   Variables  DEPLOY_PATH      optional, default /opt/pie
+#              DEPLOY_SSH_PORT  optional, default 22
+#              PIE_HTTP_PORT    optional, default 80 (public port of the web pages)
+
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits instead of cancelling a deploy halfway.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run tests
+        run: python -m pytest backend/tests -k "not real_erp" -q
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        image: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      # Registry image names must be lowercase.
+      - name: Image name
+        id: name
+        run: echo "prefix=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/${{ matrix.image }}.Dockerfile
+          push: true
+          tags: |
+            ${{ steps.name.outputs.prefix }}/pie-${{ matrix.image }}:${{ github.sha }}
+            ${{ steps.name.outputs.prefix }}/pie-${{ matrix.image }}:latest
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: read
+    env:
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/pie' }}
+      PIE_HTTP_PORT: ${{ vars.PIE_HTTP_PORT || '80' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image name
+        id: name
+        run: echo "prefix=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Copy docker-compose.yml to the server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ vars.DEPLOY_SSH_PORT || 22 }}
+          source: docker-compose.yml
+          target: ${{ env.DEPLOY_PATH }}
+
+      - name: Pull the new images and restart
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          PIE_IMAGE_PREFIX: ${{ steps.name.outputs.prefix }}
+          PIE_TAG: ${{ github.sha }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ vars.DEPLOY_SSH_PORT || 22 }}
+          envs: DEPLOY_PATH,PIE_HTTP_PORT,PIE_IMAGE_PREFIX,PIE_TAG,GHCR_USER,GHCR_TOKEN
+          script_stop: true
+          script: |
+            set -eu
+            cd "$DEPLOY_PATH"
+
+            # Files the containers need; created once by hand (see docker-compose.yml).
+            for f in pie.env htpasswd; do
+              [ -f "$f" ] || { echo "Missing $DEPLOY_PATH/$f on the server"; exit 1; }
+            done
+            [ -d outputs ] || { echo "Missing $DEPLOY_PATH/outputs on the server"; exit 1; }
+
+            # Which images to run; read automatically by docker compose.
+            printf 'PIE_IMAGE_PREFIX=%s\nPIE_TAG=%s\nPIE_HTTP_PORT=%s\n' \
+              "$PIE_IMAGE_PREFIX" "$PIE_TAG" "$PIE_HTTP_PORT" > .env
+
+            # The workflow token expires after this job, so log in only for the pull.
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker compose pull
+            docker logout ghcr.io
+
+            docker compose up -d --remove-orphans
+            docker image prune -f
+
+            # Wait for nginx -> backend to answer.
+            for i in $(seq 1 30); do
+              if curl -fsS "http://localhost:$PIE_HTTP_PORT/health" > /dev/null; then
+                echo "PIE is up: http://$(hostname -I | awk '{print $1}'):$PIE_HTTP_PORT/"
+                exit 0
+              fi
+              sleep 3
+            done
+            echo "PIE did not become healthy"; docker compose ps; docker compose logs --tail 80
+            exit 1

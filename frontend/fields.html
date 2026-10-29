@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIE Field Explorer</title>
+<meta name="description" content="Field-level knowledge for GoodBooks ERP screens: every field with type, rules, dependencies, database and code mapping, usage and evidence.">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#dfe3e8; --text:#17202a; --muted:#5b6673;
+  --accent:#2457d6; --accent-soft:#e7eefc; --ok:#1f7a4d; --ok-soft:#e3f4ea; --warn:#9a5b00; --warn-soft:#fdf1dc;
+  --bad:#a33a2b; --bad-soft:#fbe7e3; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --radius:10px; --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+    --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+    --bad:#f08a78; --bad-soft:#3a1d18; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+  --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+  --bad:#f08a78; --bad-soft:#3a1d18; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:12px;word-break:break-all}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--border)}
+.top-inner{max-width:1440px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;min-width:0;margin-right:8px}
+.brand b{font-size:16px}
+.brand span{color:var(--muted);font-size:12px}
+.appnav{display:flex;gap:2px;flex-wrap:wrap;margin-right:auto}
+.appnav a{padding:6px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+.appnav a:hover{background:var(--surface-2);color:var(--text)}
+.appnav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.search{flex:1 1 240px;max-width:380px}
+.search input,select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
+select{width:auto}
+.btn{color:var(--text);border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 12px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-2)}
+.btn.small{padding:4px 9px;font-size:12px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+main{max-width:1440px;margin:0 auto;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow)}
+.stat .v{font-size:22px;font-weight:650;font-variant-numeric:tabular-nums}
+.stat .l{color:var(--muted);font-size:12px}
+.note{border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:10px}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.note.info{background:var(--accent-soft);color:var(--accent)}
+.layout{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
+aside.filters{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow:auto}
+.fgroup{margin-bottom:14px}
+.fgroup h3{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.fopt{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;border:0;background:none;padding:5px 8px;border-radius:6px;cursor:pointer}
+.fopt:hover{background:var(--surface-2)}
+.fopt[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.fopt .n{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;color:var(--muted)}
+.toolbar .spacer{margin-left:auto}
+.tablewrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+th{position:sticky;top:0;background:var(--surface-2);color:var(--muted);font-weight:600;font-size:12px;z-index:1}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr.sel{background:var(--accent-soft)}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border);margin:1px 3px 1px 0;white-space:nowrap}
+.tag.req{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.tag.calc{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.tag.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.tag.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.muted{color:var(--muted)}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+
+.drawer-bg{position:fixed;inset:0;background:rgba(10,14,20,.45);z-index:20;display:none}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(760px,100%);background:var(--surface);z-index:21;border-left:1px solid var(--border);display:none;flex-direction:column}
+.drawer.open{display:flex}.drawer-bg.open{display:block}
+.dhead{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.dhead h2{margin:0 0 4px;font-size:19px}
+.dbody{padding:14px 18px 24px;overflow:auto;flex:1}
+.dfoot{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+section.blk{margin-bottom:16px}
+section.blk h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;display:flex;gap:8px;align-items:center}
+dl.kv{display:grid;grid-template-columns:190px 1fr;gap:4px 12px;margin:0}
+dl.kv dt{color:var(--muted)}
+dl.kv dd{margin:0;overflow-wrap:anywhere}
+.ai{border:1px dashed var(--warn);border-radius:8px;padding:10px 12px;background:color-mix(in srgb,var(--warn-soft) 45%,transparent)}
+ul.plain{margin:0;padding-left:18px}
+ul.plain li{margin:2px 0}
+pre{background:var(--surface-2);padding:8px 10px;border-radius:6px;overflow:auto;font-size:12px;margin:6px 0 0;max-height:220px}
+.link{background:none;border:0;color:var(--accent);cursor:pointer;padding:0;text-decoration:underline}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.filters-toggle{display:none}
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr}
+  aside.filters{position:static;display:none;max-height:none}
+  aside.filters.open{display:block}
+  .filters-toggle{display:inline-flex}
+  .col-hide{display:none}
+  dl.kv{grid-template-columns:1fr}
+  dl.kv dt{margin-top:6px}
+}
+</style>
+<!--PIE_EMBEDDED_DATA-->
+<script src="config.js"></script>
+<script src="modules.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><b>Field Explorer</b><span id="subtitle">Field-level ERP knowledge with evidence</span></div>
+    <nav class="appnav" id="appnav" aria-label="PIE pages"><a href="index.html">Home</a><a href="chat.html">Ask PIE</a><a href="catalog.html">Feature Catalog</a><a href="fields.html" aria-current="page">Field Explorer</a><a href="relations.html">Relationships</a><a href="logs.html">Activity Log</a><a href="intelligence.html">Department Knowledge</a></nav>
+    <div id="modules"></div>
+    <label class="sr-only" for="screen">Screen</label>
+    <select id="screen" aria-label="Screen"></select>
+    <div class="search"><label class="sr-only" for="q">Search fields</label><input id="q" type="search" placeholder="Search label, technical name, column…" autocomplete="off"></div>
+    <button class="btn" id="theme" type="button" aria-label="Toggle colour theme">◐</button>
+  </div>
+</header>
+
+<main>
+  <div class="stats" id="stats"></div>
+  <div id="notes"></div>
+  <div class="layout">
+    <aside class="filters" id="filters" aria-label="Filters"></aside>
+    <div>
+      <div class="toolbar">
+        <button class="btn small filters-toggle" id="filters-toggle" type="button" aria-expanded="false" aria-controls="filters">Filters</button>
+        <span id="count"></span>
+        <span class="spacer"></span>
+        <a class="btn small" id="excel" href="#">Download Excel (all attributes)</a>
+        <button class="btn small" id="csv" type="button">Download CSV (filtered)</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Field</th><th>Technical name</th><th class="col-hide">Tab</th><th class="col-hide">Type</th><th>Rules</th><th class="col-hide">Stored in</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="drawer-bg" id="drawer-bg"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title">
+  <div class="dhead">
+    <div style="flex:1;min-width:0"><h2 id="d-title"></h2><div id="d-meta"></div></div>
+    <button class="btn small" id="d-close" type="button" aria-label="Close">✕</button>
+  </div>
+  <div class="dbody" id="d-body"></div>
+  <div class="dfoot">
+    <a class="btn primary" id="d-ask" href="#">Ask PIE about this field</a>
+    <button class="btn" id="d-copy" type="button">Copy summary</button>
+    <button class="btn" id="d-link" type="button">Copy link</button>
+  </div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  // Backend address: an exported file's embedded setting, else frontend/config.js.
+  const API = (b => b && !b.endsWith("/") ? b + "/" : b)((window.__PIE_CHAT__ && window.__PIE_CHAT__.apiBase) || (window.PIE_CONFIG && window.PIE_CONFIG.apiBase) || "");
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem("pie-fields:" + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem("pie-fields:" + k, JSON.stringify(v)); }catch(e){} },
+  };
+  const EMBEDDED = Array.isArray(window.__PIE_FIELDS__);
+  const SERVERLESS = !EMBEDDED && !API;
+  const state = {screens: [], dicts: {}, screen: null, q: "", page: "", flags: new Set(), open: null};
+  const FLAGS = [
+    ["mandatory", "Mandatory", r => r.mandatory.required],
+    ["conditional", "Conditionally mandatory", r => !!r.mandatory.conditional],
+    ["calculated", "Calculated", r => !!r.calculation],
+    ["lookup", "Lookup (picklist)", r => !!(r.lookup && r.lookup.picklist)],
+    ["options", "Fixed options", r => r.allowedValues.length > 0],
+    ["deps", "Has dependencies", r => r.dependencies.length > 0],
+    ["stored", "Stored in main table", r => r.database.storage === "column"],
+    ["lookupdb", "Shown from related master", r => r.database.storage === "related master (display)"],
+    ["notstored", "Not stored", r => /not stored/.test(r.database.storage || "")],
+    ["used", "Used by other modules", r => Object.keys(r.usage.modules || {}).length > 0],
+    ["hidden", "Hidden / system", r => !r.visibleOnScreen || r.type.ui === "Hidden / system field"],
+    ["review", "AI text needs review", r => !!(r.explanation && r.explanation.reviewNote)],
+    ["conflict", "Source conflict / label note", r => !!(r.duplicateDefinition || r.labelNote)],
+  ];
+
+  // theme
+  const theme = store.get("theme", "");
+  if (theme) document.documentElement.setAttribute("data-theme", theme);
+  $("theme").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = cur === "dark" ? "light" : "dark"; document.documentElement.setAttribute("data-theme", next); store.set("theme", next);
+  });
+  function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1600); }
+  if (EMBEDDED){ $("appnav").hidden = true; }
+
+  // ---- data
+  async function load(){
+    if (EMBEDDED){
+      window.__PIE_FIELDS__.forEach(d => { const k = (d.sources && d.sources.formDefinition || "").split("/").pop().replace(".json", "") || d.screenId; state.dicts[k] = d; state.screens.push({screen: k, screenName: d.screen, module: d.module, statistics: d.statistics}); });
+    } else if (SERVERLESS){
+      return fail("No backend address is configured. Set apiBase in frontend/config.js (for example http://localhost:8000/usage/).");
+    } else {
+      const r = await fetch(API + "api/fields"); if (!r.ok) throw new Error("Could not load field dictionaries (" + r.status + ")");
+      state.screens = await r.json();
+    }
+    if (!state.screens.length) return fail("No field dictionary has been built yet. Run: python -m pie_agent.cli fields-build --enrich");
+    // Module picker: the screen list shows the chosen modules only (none chosen = all).
+    const mods = [...new Set(state.screens.map(s => s.module || "other"))].sort();
+    const count = m => state.screens.filter(s => (s.module || "other") === m).length;
+    state.picker = PieModules.create($("modules"), {
+      title: "Screens of", selected: (PieModules.fromUrl() || store.get("modules", [])).filter(m => mods.includes(m)),
+      options: mods.map(m => ({value: m, label: m.length <= 4 ? m.toUpperCase() : m.charAt(0).toUpperCase() + m.slice(1), note: `${count(m)} screens`})),
+      onChange: sel => { store.set("modules", sel); fillScreens();
+        if (!visibleScreens().some(s => s.screen === state.screen) && visibleScreens().length) selectScreen(visibleScreens()[0].screen).catch(err => fail(err.message)); },
+    });
+    fillScreens();
+    const params = new URLSearchParams(location.search);
+    const want = params.get("screen") || store.get("screen", "");
+    const pool = visibleScreens().length ? visibleScreens() : state.screens;
+    await selectScreen(pool.some(s => s.screen === want) ? want : pool[0].screen);
+    if (params.get("q")){ state.q = params.get("q"); $("q").value = state.q; renderRows(); }
+    if (params.get("field")) openField(params.get("field"));
+  }
+  function visibleScreens(){
+    const sel = state.picker ? state.picker.get() : [];
+    return state.screens.filter(s => !sel.length || sel.includes(s.module || "other"));
+  }
+  // Grouped by module, screens alphabetical, with their field counts.
+  function fillScreens(){
+    const byModule = {};
+    visibleScreens().forEach(s => { (byModule[s.module || "other"] = byModule[s.module || "other"] || []).push(s); });
+    $("screen").innerHTML = Object.keys(byModule).sort().map(m => `<optgroup label="${esc(m.toUpperCase())}">` +
+      byModule[m].sort((a, b) => String(a.screenName).localeCompare(b.screenName))
+        .map(s => `<option value="${esc(s.screen)}">${esc(s.screenName)}${s.statistics && s.statistics.fields ? " (" + s.statistics.fields + ")" : ""}</option>`).join("") +
+      `</optgroup>`).join("");
+    if (state.screen) $("screen").value = state.screen;
+  }
+  function fail(msg){ $("rows").innerHTML = `<tr><td colspan="6" class="empty">${esc(msg)}</td></tr>`; $("excel").hidden = true; }
+
+  async function selectScreen(screen){
+    if (!state.dicts[screen]){
+      const r = await fetch(API + "api/fields/" + encodeURIComponent(screen)); if (!r.ok) throw new Error("Could not load " + screen + " (" + r.status + ")");
+      state.dicts[screen] = await r.json();
+    }
+    state.screen = screen; store.set("screen", screen); $("screen").value = screen;
+    const d = state.dicts[screen];
+    $("subtitle").textContent = `${d.screen} · ${d.module} · table ${d.table} · generated ${new Date(d.generatedAt).toLocaleDateString()}`;
+    $("excel").href = `${API}api/fields/${encodeURIComponent(screen)}/excel`;
+    $("excel").hidden = EMBEDDED;
+    state.page = ""; state.flags.clear();
+    render();
+  }
+
+  const dict = () => state.dicts[state.screen];
+  const key = r => r.fieldKey || r.fieldName;
+
+  // Tab, else section, else hidden (ESS screens use sections instead of tabs) - same rule as chat._where.
+  function where(r) { return r.page || r.section || (r.visibleOnScreen ? "Main form" : "Not shown on screen"); }
+  function matches(r){
+    if (state.page && where(r) !== state.page) return false;
+    for (const f of state.flags){ const def = FLAGS.find(x => x[0] === f); if (def && !def[2](r)) return false; }
+    if (state.q){
+      const hay = [r.label, r.fieldName, r.labelKey, r.database.column, r.page, r.section, r.type.ui,
+                   (r.database.lookupDisplay || {}).table, (r.lookup || {}).source].join(" ").toLowerCase();
+      if (!state.q.toLowerCase().split(/\s+/).every(w => hay.includes(w))) return false;
+    }
+    return true;
+  }
+
+  // ---- render
+  function render(){ renderStats(); renderNotes(); renderFilters(); renderRows(); }
+  function renderStats(){
+    const s = dict().statistics;
+    $("stats").innerHTML = [
+      [s.fields, "Field definitions"], [s.uniqueFields || s.fields, "Unique fields"], [s.mandatory, "Mandatory"],
+      [s.mappedToColumn, "Stored in " + dict().table], [s.lookups, "Lookups"], [s.calculated, "Calculated"],
+      [s.usedByOtherModules, "Used by other modules"], [s.explained, "With AI explanation"],
+    ].map(([v, l]) => `<div class="stat"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
+  }
+  function renderNotes(){
+    const d = dict(); const notes = [];
+    const dup = [...new Set(d.fields.filter(r => r.duplicateDefinition).map(r => r.duplicateDefinition))];
+    dup.forEach(x => notes.push(`<div class="note warn"><b>Source conflict:</b> ${esc(x)}.</div>`));
+    const flagged = d.statistics.explanationsFlagged || 0;
+    notes.push(`<div class="note info">Facts in every record come directly from the ERP sources, with file and line evidence. Text in the dashed <b>AI-derived</b> box is written by AI from those facts only${flagged ? `; ${flagged} of these explanations carry a review note` : ""}. Check it before external use.</div>`);
+    $("notes").innerHTML = notes.join("");
+  }
+  function opt(group, value, label, n, pressed){
+    return `<button class="fopt" type="button" aria-pressed="${pressed}" data-group="${group}" data-value="${esc(value)}"><span>${esc(label)}</span><span class="n">${n}</span></button>`;
+  }
+  function renderFilters(){
+    const fs = dict().fields; const pages = {};
+    fs.forEach(r => { const p = where(r); pages[p] = (pages[p] || 0) + 1; });
+    $("filters").innerHTML =
+      `<div class="fgroup"><h3>Tab / section</h3>${opt("page", "", "All", fs.length, !state.page)}${Object.keys(pages).map(p => opt("page", p, p, pages[p], state.page === p)).join("")}</div>
+       <div class="fgroup"><h3>Show only</h3>${FLAGS.map(([k, label, fn]) => opt("flag", k, label, fs.filter(fn).length, state.flags.has(k))).join("")}</div>`;
+  }
+  function storedIn(r){
+    const db = r.database;
+    if (db.column) return `<code>${esc(db.table)}.${esc(db.column)}</code>`;
+    if (db.lookupDisplay) return `<code>${esc(db.lookupDisplay.table)}.${esc(db.lookupDisplay.column)}</code> <span class="muted">(lookup)</span>`;
+    if (db.childTable) return `<code>${esc(db.childTable.table)}</code> <span class="muted">(grid rows)</span>`;
+    return `<span class="muted">${esc(db.storage || "")}</span>`;
+  }
+  function ruleTags(r){
+    const t = [];
+    if (r.mandatory.required) t.push(`<span class="tag req">${r.mandatory.conditional ? "Mandatory (conditional)" : "Mandatory"}</span>`);
+    if (r.calculation) t.push(`<span class="tag calc">Calculated</span>`);
+    if (r.allowedValues.length) t.push(`<span class="tag">${r.allowedValues.length} options</span>`);
+    if (r.dependencies.length) t.push(`<span class="tag">${r.dependencies.length} dependencies</span>`);
+    if (r.duplicateDefinition || r.labelNote) t.push(`<span class="tag warn">note</span>`);
+    return t.join("");
+  }
+  function renderRows(){
+    const list = dict().fields.filter(matches);
+    $("count").textContent = `${list.length} of ${dict().fields.length} fields`;
+    $("rows").innerHTML = list.length ? list.map(r => `<tr data-key="${esc(key(r))}" class="${state.open && key(state.open) === key(r) ? "sel" : ""}">
+      <td><b>${esc(r.label)}</b>${r.section ? `<div class="muted" style="font-size:12px">${esc(r.section)}</div>` : ""}</td>
+      <td><code>${esc(r.fieldName)}</code></td>
+      <td class="col-hide">${esc(where(r))}</td>
+      <td class="col-hide">${esc(r.type.ui || r.type.form)}</td>
+      <td>${ruleTags(r)}</td>
+      <td class="col-hide">${storedIn(r)}</td></tr>`).join("") : `<tr><td colspan="6" class="empty">No fields match these filters.</td></tr>`;
+  }
+
+  // ---- detail
+  const kv = rows => `<dl class="kv">${rows.filter(([, v]) => v !== "" && v != null).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join("")}</dl>`;
+  const nf = `<span class="muted">Not found in the analysed sources</span>`;
+  const fieldLink = n => { const r = dict().fields.find(x => x.fieldName === n); return r ? `<button class="link" type="button" data-field="${esc(key(r))}">${esc(r.label)}</button> <code>${esc(n)}</code>` : `<code>${esc(n)}</code>`; };
+
+  function openField(k){
+    const r = dict().fields.find(x => key(x) === k || x.fieldName === k); if (!r) return;
+    state.open = r; renderRows();
+    const d = dict(), e = r.explanation, m = r.mandatory, db = r.database, fe = r.frontend, be = r.backend, u = r.usage;
+    $("d-title").textContent = r.label;
+    $("d-meta").innerHTML = `<code>${esc(r.fieldName)}</code> · ${esc(d.screen)}${r.page ? " · " + esc(r.page) : ""}${r.section ? " › " + esc(r.section) : ""} ${ruleTags(r)}`;
+    const mandatory = (m.required ? "Yes" : "No") + (m.conditional ? ` — only when ${fieldLink(m.conditional.field)} is ${esc(JSON.stringify(m.conditional.values))}` : "")
+      + (m.backendValidated ? " · validated by the backend" : "") + (m.databaseNotNull ? " · database column NOT NULL" : "");
+    const sections = [];
+    if (r.duplicateDefinition || r.labelNote) sections.push(`<div class="note warn">${esc([r.duplicateDefinition, r.labelNote].filter(Boolean).join(". "))}.</div>`);
+    sections.push(`<section class="blk"><h3>1 · Identity</h3>${kv([
+      ["Field name", esc(r.label)], ["Label key", r.labelKey ? `<code>${esc(r.labelKey)}</code> <span class="muted">(${esc(r.labelSource)})</span>` : `<span class="muted">${esc(r.labelSource)}</span>`],
+      ["Technical name", `<code>${esc(r.fieldName)}</code>`], ["Screen / tab / section", esc([d.screen, r.page, r.section].filter(Boolean).join(" › "))],
+      ["Visible on screen", r.visibleOnScreen ? "Yes" : "No (hidden or system field)"]])}</section>`);
+    sections.push(`<section class="blk"><h3>2 · Meaning <span class="tag warn">AI-derived</span>${e ? `<span class="tag">${esc(e.confidence)} confidence</span>` : ""}</h3>${e ? `<div class="ai">${kv([
+      ["Purpose", esc(e.purpose)], ["What it represents", esc(e.businessMeaning)], ["Business usage", esc(e.businessUsage)],
+      ["Impact on transactions", esc(e.transactionImpact)], ["Example", esc(e.example)], ["Business rules", esc(e.businessRules)]])}
+      ${e.reviewNote ? `<div class="note warn" style="margin:8px 0 0"><b>Review:</b> ${esc(e.reviewNote)}.</div>` : ""}</div>` : nf}</section>`);
+    sections.push(`<section class="blk"><h3>3 · Type &amp; values</h3>${kv([
+      ["Field type (screen)", esc(r.type.ui)], ["Form type", esc(r.type.form)], ["Backend type", r.type.backend ? `<code>${esc(r.type.backend)}</code>` : nf],
+      ["Database type", r.type.database ? `<code>${esc(r.type.database)}</code>` : nf],
+      ["Allowed values", r.allowedValues.length ? r.allowedValues.map(v => `<span class="tag">${esc(v.value)} = ${esc(v.label)}</span>`).join("") : nf],
+      ["Default value", r.defaultValue === null || r.defaultValue === undefined ? nf : (r.defaultValue === "" ? `empty text <span class="muted">(defined as "" in the form)</span>` : `<code>${esc(JSON.stringify(r.defaultValue))}</code>`)],
+      ["Placeholder", esc(fe.placeholder)]])}</section>`);
+    sections.push(`<section class="blk"><h3>4 · Mandatory, validations &amp; messages</h3>${kv([["Mandatory", mandatory],
+      ["Validation rules", r.validations.length ? `<ul class="plain">${r.validations.map(v => `<li><span class="tag">${esc(v.layer)}</span>${esc(v.rule)}</li>`).join("")}</ul>` : nf],
+      ["Error / validation messages", r.messages.length ? `<ul class="plain">${r.messages.map(x => `<li>“${esc(x.message)}” <span class="muted">(${esc(x.layer)})</span></li>`).join("")}</ul>` : nf]])}</section>`);
+    sections.push(`<section class="blk"><h3>5 · Dependencies &amp; calculation</h3>${kv([
+      ["Calculation / formula", r.calculation ? `<code>${esc(r.calculation.formula)}</code>${r.calculation.readOnly ? ' <span class="tag">read-only</span>' : ""}` : nf],
+      ["Dependencies", r.dependencies.length ? `<ul class="plain">${r.dependencies.map(x => `<li><b>${esc(x.kind)}</b> ${x.fields.map(fieldLink).join(", ")} <span class="muted">${esc((x.detail || "").slice(0, 160))}</span></li>`).join("")}</ul>` : nf],
+      ["Configuration dependency", r.configuration.length ? `<ul class="plain">${r.configuration.map(c => `<li>${esc(c)}</li>`).join("")}</ul>` : nf],
+      ["Related fields", r.relatedFields.length ? r.relatedFields.map(fieldLink).join(", ") : nf]])}
+      ${r.handlerLogic.map(h => `<details style="margin-top:6px"><summary class="muted">Screen logic: ${esc(h.event)} → ${esc(h.handler)}() (line ${esc(h.line)})${h.updates.length ? " updates " + esc(h.updates.join(", ")) : ""}</summary><pre>${esc(h.code)}</pre></details>`).join("")}</section>`);
+    sections.push(`<section class="blk"><h3>6 · Data source &amp; database</h3>${kv([
+      ["Storage", esc(db.storage)],
+      ["Database table.column", db.column ? `<code>${esc(db.table)}.${esc(db.column)}</code>${db.primaryKey ? ' <span class="tag">primary key</span>' : ""}` : nf],
+      ["Nullable", db.nullable === null || db.nullable === undefined ? "" : (db.nullable ? "Yes" : "No")],
+      ["Foreign key", db.foreignKey ? `<code>${esc(db.foreignKey.table)}.${esc(db.foreignKey.column)}</code>` : ""],
+      ["Shown from", db.lookupDisplay ? `<code>${esc(db.lookupDisplay.table)}.${esc(db.lookupDisplay.column)}</code> (related master)` : ""],
+      ["Grid rows saved to", db.childTable ? `<code>${esc(db.childTable.table)}</code> via ${esc(db.childTable.query)}` : ""],
+      ["Lookup / data source", r.lookup && r.lookup.picklist ? `picklist <code>${esc(r.lookup.picklist)}</code> → <code>${esc(r.lookup.source || "?")}</code>${r.lookup.displayColumns ? " showing " + esc(r.lookup.displayColumns) : ""}${r.lookup.criteria ? " · criteria " + esc(r.lookup.criteria) : ""}${r.lookup.allowAddNew ? " · add new allowed" : ""}` : ""],
+      ["Grid columns", fe.grid && fe.grid.length ? fe.grid.map(g => `<span class="tag">${esc(g.label || g.column)}</span>`).join("") : ""]])}</section>`);
+    sections.push(`<section class="blk"><h3>7 · Backend &amp; frontend mapping</h3>${kv([
+      ["Backend DTO", be.dto ? `<code>${esc(be.dto)}</code> <span class="muted">${esc(be.dtoFile)}${be.dtoLine ? ":" + esc(be.dtoLine) : ""}</span>` : nf],
+      ["Queries", be.queries.length ? be.queries.map(q => `<code>${esc(q)}</code>`).join(", ") : nf],
+      ["API endpoints", be.endpoints.length ? be.endpoints.map(x => `<code>${esc(x.method)} ${esc(x.route)}</code>`).join(", ") : nf],
+      ["Business logic", be.bll ? `<code>${esc(be.bll)}</code>` : ""],
+      ["Frontend control", fe.control ? `<code>&lt;${esc(fe.control)}&gt;</code> in <code>${esc(fe.component)}</code>${fe.htmlLine ? " (template line " + esc(fe.htmlLine) + ")" : ""}` : nf],
+      ["Screen events", fe.events.length ? fe.events.map(x => `<code>(${esc(x.event)}) → ${esc(x.handler)}()</code>`).join(", ") : ""],
+      ["Form definition", `<code>${esc(fe.formDefinition)}</code>`], ["Posted on save", fe.postData === undefined || fe.postData === null ? "" : (fe.postData ? "Yes" : "No")]])}</section>`);
+    sections.push(`<section class="blk"><h3>8 · Usage across the ERP</h3>${kv([
+      ["Related masters", r.relatedMasters.length ? r.relatedMasters.map(x => `<span class="tag">${esc(x)}</span>`).join("") : nf],
+      ["Modules using it", Object.keys(u.modules).length ? Object.entries(u.modules).map(([k, v]) => `<span class="tag">${esc(k)} · ${esc(v)}</span>`).join("") : nf],
+      ["Reports / documents", u.reports.length ? `<ul class="plain">${u.reports.map(x => `<li><code>${esc(x)}</code></li>`).join("")}</ul>` : nf],
+      ["Other screens", u.screens.length ? u.screens.slice(0, 15).map(x => `<span class="tag">${esc(x)}</span>`).join("") : nf],
+      ["Sample references", u.backendReferences.length ? `<ul class="plain">${u.backendReferences.map(x => `<li><code>${esc(x.source)}:${esc(x.line)}</code> <span class="muted">${esc(x.fact)}</span></li>`).join("")}</ul>` : ""]])}</section>`);
+    sections.push(`<section class="blk"><h3>9 · Source evidence</h3><ul class="plain">${r.evidence.map(x => `<li><code>${esc(x.source)}${x.line ? ":" + esc(x.line) : ""}</code> <span class="muted">${esc(x.fact)}</span></li>`).join("")}</ul></section>`);
+    $("d-body").innerHTML = sections.join("");
+    $("d-ask").href = "chat.html?q=" + encodeURIComponent(`Tell me everything about the ${r.label} (${r.fieldName}) field in ${d.screen}`);
+    $("d-ask").hidden = EMBEDDED;
+    $("drawer").classList.add("open"); $("drawer-bg").classList.add("open"); $("d-body").scrollTop = 0; $("d-close").focus();
+  }
+  function closeField(){ $("drawer").classList.remove("open"); $("drawer-bg").classList.remove("open"); state.open = null; renderRows(); }
+
+  function summary(r){
+    const m = r.mandatory, db = r.database, e = r.explanation || {};
+    return [`${r.label} (${r.fieldName}) — ${dict().screen}${r.page ? ", " + r.page : ""}`,
+      `Type: ${r.type.ui}${r.type.database ? " / " + r.type.database : ""}`,
+      `Mandatory: ${m.required ? "Yes" : "No"}${m.conditional ? " (when " + m.conditional.field + " = " + JSON.stringify(m.conditional.values) + ")" : ""}`,
+      r.allowedValues.length ? "Allowed values: " + r.allowedValues.map(v => v.value + "=" + v.label).join(", ") : "",
+      r.validations.length ? "Validations: " + r.validations.map(v => v.rule).join("; ") : "",
+      r.calculation ? "Formula: " + r.calculation.formula : "",
+      db.column ? `Stored in ${db.table}.${db.column}` : (db.lookupDisplay ? `Shown from ${db.lookupDisplay.table}.${db.lookupDisplay.column}` : "Storage: " + db.storage),
+      e.purpose ? "Purpose (AI-derived): " + e.purpose : ""].filter(Boolean).join("\n");
+  }
+  async function copy(t){ try{ await navigator.clipboard.writeText(t); toast("Copied"); }catch(_){ toast("Copy failed"); } }
+  function csv(){
+    const rows = [["#","Field","Technical name","Tab","Section","Type","DB type","Mandatory","Allowed values","Default","Validations","Formula","Stored in","Lookup source","Used by modules","Purpose (AI-derived)"]];
+    dict().fields.filter(matches).forEach(r => rows.push([r.order, r.label, r.fieldName, r.page, r.section, r.type.ui, r.type.database,
+      r.mandatory.required ? "Yes" : "No", r.allowedValues.map(v => v.value + "=" + v.label).join("; "), r.defaultValue == null ? "" : r.defaultValue,
+      r.validations.map(v => v.rule).join("; "), r.calculation ? r.calculation.formula : "",
+      r.database.column ? r.database.table + "." + r.database.column : (r.database.lookupDisplay ? r.database.lookupDisplay.table + "." + r.database.lookupDisplay.column : r.database.storage),
+      (r.lookup || {}).source || "", Object.keys(r.usage.modules).join(", "), (r.explanation || {}).purpose || ""]));
+    const body = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + body], {type: "text/csv"}));
+    a.download = `${state.screen}-fields.csv`; a.click(); URL.revokeObjectURL(a.href);
+  }
+
+  // ---- events
+  $("screen").addEventListener("change", e => selectScreen(e.target.value).catch(err => fail(err.message)));
+  let qt; $("q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(() => { state.q = e.target.value.trim(); renderRows(); }, 120); });
+  $("filters").addEventListener("click", e => {
+    const b = e.target.closest(".fopt"); if (!b) return;
+    if (b.dataset.group === "page") state.page = b.dataset.value;
+    else if (state.flags.has(b.dataset.value)) state.flags.delete(b.dataset.value); else state.flags.add(b.dataset.value);
+    renderFilters(); renderRows();
+  });
+  $("filters-toggle").addEventListener("click", e => { const o = $("filters").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", o); });
+  $("rows").addEventListener("click", e => { const tr = e.target.closest("tr[data-key]"); if (tr) openField(tr.dataset.key); });
+  $("d-body").addEventListener("click", e => { const b = e.target.closest("[data-field]"); if (b) openField(b.dataset.field); });
+  $("d-close").addEventListener("click", closeField);
+  $("drawer-bg").addEventListener("click", closeField);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && state.open) closeField(); });
+  $("csv").addEventListener("click", csv);
+  $("d-copy").addEventListener("click", () => state.open && copy(summary(state.open)));
+  $("d-link").addEventListener("click", () => {
+    if (!state.open) return; const u = new URL(location.href);
+    u.search = new URLSearchParams({screen: state.screen, field: key(state.open)}).toString(); copy(u.toString());
+  });
+
+  load().catch(err => fail(err.message));
+})();
+</script>
+</body>
+</html>

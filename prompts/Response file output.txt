@@ -1,0 +1,194 @@
+[
+  {
+    "VariantCode": "VAR-LEAVE-001",
+    "VariantName": "Leave Credit Method",
+    "Description": "Determines how leave credits are generated for employees.",
+    "PlainLanguageDesc": "Choose how employees earn leave—fixed allocation, monthly accrual, credit-based, or workdays-based calculation.",
+    "IsDefault": 0,
+    "Implications": [
+      {
+        "ImplicationType": 2,
+        "EffortDeltaHours": 6,
+        "Description": "Leave accrual policy configuration is required.",
+        "RiskNote": "Incorrect configuration results in inaccurate leave balances."
+      },
+      {
+        "ImplicationType": 3,
+        "EffortDeltaHours": 2,
+        "Description": "HR administrators require training on leave credit policies.",
+        "RiskNote": "Improper understanding may cause incorrect leave setup."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-002",
+    "VariantName": "Leave Type",
+    "Description": "Defines the category of leave maintained in the organization.",
+    "PlainLanguageDesc": "Configure different leave categories such as Casual Leave, Sick Leave, Earned Leave, LOP, Holiday, Comp-Off, etc.",
+    "IsDefault": 0,
+    "Implications": [
+      {
+        "ImplicationType": 2,
+        "EffortDeltaHours": 8,
+        "Description": "Each leave type requires policy, eligibility, and balance configuration.",
+        "RiskNote": "Incorrect leave type mapping impacts payroll and attendance."
+      },
+      {
+        "ImplicationType": 4,
+        "EffortDeltaHours": 1,
+        "Description": "HR leave policy document should define each leave type.",
+        "RiskNote": "Employees may misunderstand leave eligibility."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-003",
+    "VariantName": "Include Holiday Rule",
+    "Description": "Controls how holidays are treated during leave calculation.",
+    "PlainLanguageDesc": "Choose whether holidays are excluded, included, or considered only while applying leave.",
+    "IsDefault": 0,
+    "Implications": [
+      {
+        "ImplicationType": 2,
+        "EffortDeltaHours": 3,
+        "Description": "Holiday calculation rules must be configured.",
+        "RiskNote": "Incorrect holiday rules produce wrong leave duration."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-004",
+    "VariantName": "Surrounding Day Rule",
+    "Description": "Determines whether weekends and holidays surrounding leave are counted.",
+    "PlainLanguageDesc": "Configure sandwich leave policy.",
+    "IsDefault": 0,
+    "Implications": [
+      {
+        "ImplicationType": 5,
+        "EffortDeltaHours": 2,
+        "Description": "Business policy approval required before enabling.",
+        "RiskNote": "Employees may dispute leave calculations."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-005",
+    "VariantName": "Leave Salary Percentage",
+    "Description": "Percentage of salary payable during leave.",
+    "PlainLanguageDesc": "Specify whether leave is fully paid, partially paid, or unpaid.",
+    "IsDefault": 1,
+    "Implications": [
+      {
+        "ImplicationType": 6,
+        "EffortDeltaHours": 4,
+        "Description": "Impacts payroll calculations.",
+        "RiskNote": "Incorrect percentage directly affects employee salary."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-006",
+    "VariantName": "Leave Encashment",
+    "Description": "Specifies whether unused leave can be encashed.",
+    "PlainLanguageDesc": "Enable employees to receive payment for unused leave.",
+    "IsDefault": 0,
+    "Implications": [
+      {
+        "ImplicationType": 6,
+        "EffortDeltaHours": 5,
+        "Description": "Payroll integration required.",
+        "RiskNote": "Incorrect setup affects financial liabilities."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-007",
+    "VariantName": "Leave Balance Maintenance",
+    "Description": "Controls whether leave balances are tracked.",
+    "PlainLanguageDesc": "Enable balance tracking for eligible leave types.",
+    "IsDefault": 1,
+    "Implications": [
+      {
+        "ImplicationType": 2,
+        "EffortDeltaHours": 3,
+        "Description": "Leave balance maintenance configuration required.",
+        "RiskNote": "Balance inconsistencies may occur."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-008",
+    "VariantName": "Carry Forward",
+    "Description": "Determines whether unused leave is carried to the next leave year.",
+    "PlainLanguageDesc": "Configure annual carry-forward rules.",
+    "IsDefault": 0,
+    "Implications": [
+      {
+        "ImplicationType": 2,
+        "EffortDeltaHours": 4,
+        "Description": "Carry-forward policy configuration required.",
+        "RiskNote": "Incorrect carry-forward creates inaccurate balances."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-009",
+    "VariantName": "Tracking Required",
+    "Description": "Enables workflow tracking and audit history.",
+    "PlainLanguageDesc": "Maintain complete approval and modification history.",
+    "IsDefault": 1,
+    "Implications": [
+      {
+        "ImplicationType": 1,
+        "EffortDeltaHours": 2,
+        "Description": "Additional workflow tracking activities executed.",
+        "RiskNote": "Slight increase in transaction processing time."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-010",
+    "VariantName": "Leave Request Status",
+    "Description": "Workflow status of a leave request.",
+    "PlainLanguageDesc": "Pending, Approved, Rejected, Deleted, Archived, or Inactive.",
+    "IsDefault": 1,
+    "Implications": [
+      {
+        "ImplicationType": 3,
+        "EffortDeltaHours": 1,
+        "Description": "Users should understand approval lifecycle.",
+        "RiskNote": "Incorrect status handling delays approvals."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-011",
+    "VariantName": "Leave Day Type",
+    "Description": "Represents the duration of leave for each day.",
+    "PlainLanguageDesc": "Full Day, Half Day, Hourly Permission, etc.",
+    "IsDefault": 1,
+    "Implications": [
+      {
+        "ImplicationType": 2,
+        "EffortDeltaHours": 3,
+        "Description": "Attendance and payroll rules must support multiple day types.",
+        "RiskNote": "Partial-day calculations may become inaccurate."
+      }
+    ]
+  },
+  {
+    "VariantCode": "VAR-LEAVE-012",
+    "VariantName": "Business Transaction Type",
+    "Description": "Specifies the business purpose of the leave transaction.",
+    "PlainLanguageDesc": "Leave Request, Leave Credit, Leave Debit, Encashment, Adjustment, etc.",
+    "IsDefault": 0,
+    "Implications": [
+      {
+        "ImplicationType": 2,
+        "EffortDeltaHours": 5,
+        "Description": "Business transaction configuration is required.",
+        "RiskNote": "Incorrect transaction mapping affects downstream processing."
+      }
+    ]
+  }
+]

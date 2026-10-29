@@ -1,0 +1,206 @@
+{
+  "PIEReport": {
+    "ModuleInformation": {
+      "ModuleCode": "HRMS_ESS_LEAVE_ATTENDANCE_RECORDS",
+      "ModuleName": "Employee Self Service - Leave & Attendance Records",
+      "FunctionalArea": "Human Resource Management",
+      "SubModule": "ESS",
+      "ScreenType": "Report View",
+      "Source": "Screenshot + Report Document",
+      "ConfidenceScore": 0.95
+    },
+
+    "BusinessPurpose": {
+      "Description": "Employee self-service screen to view leave, permission, on-duty and attendance related records.",
+      "BusinessValue": [
+        "Employees can view their leave transactions.",
+        "Employees can monitor leave balances.",
+        "Employees can track permission and on-duty requests.",
+        "HR can provide employee-wise leave visibility."
+      ]
+    },
+
+
+    "DetectedScreens": [
+      {
+        "ScreenName": "Permission / OnDuty (Hourwise) Request",
+        "Type": "Transaction Report",
+        "Purpose": "View employee permission and on-duty requests based on hours."
+      },
+      {
+        "ScreenName": "Leave Credit",
+        "Type": "Transaction Report",
+        "Purpose": "View leave credits assigned to employees."
+      },
+      {
+        "ScreenName": "Leave Debit",
+        "Type": "Transaction Report",
+        "Purpose": "View leave consumption/debit transactions."
+      },
+      {
+        "ScreenName": "Leave / OnDuty (Daywise) Request",
+        "Type": "Transaction Report",
+        "Purpose": "View day-wise leave and on-duty requests."
+      },
+      {
+        "ScreenName": "Leave Summary",
+        "Type": "Summary Report",
+        "Purpose": "View opening, allotted, consumed and available leave balance."
+      },
+      {
+        "ScreenName": "Adjustment Entry",
+        "Type": "Attendance Report",
+        "Purpose": "View attendance adjustment transactions."
+      }
+    ],
+
+
+    "Filters": [
+      {
+        "Name": "Employee",
+        "Type": "Lookup",
+        "Mandatory": true,
+        "SourceEvidence": "Screenshot"
+      },
+      {
+        "Name": "From Date",
+        "Type": "Date",
+        "Mandatory": true,
+        "SourceEvidence": "Screenshot"
+      },
+      {
+        "Name": "To Date",
+        "Type": "Date",
+        "Mandatory": true,
+        "SourceEvidence": "Screenshot"
+      }
+    ],
+
+
+    "ConfigItems": [],
+
+
+    "Variants": [
+      {
+        "Code": "VAR_PERMISSION_HOURWISE",
+        "Name": "Hourwise Permission / OnDuty",
+        "Category": "BizTransaction"
+      },
+      {
+        "Code": "VAR_LEAVE_CREDIT",
+        "Name": "Leave Credit View",
+        "Category": "Report"
+      },
+      {
+        "Code": "VAR_LEAVE_DEBIT",
+        "Name": "Leave Debit View",
+        "Category": "Report"
+      },
+      {
+        "Code": "VAR_LEAVE_DAYWISE",
+        "Name": "Daywise Leave / OnDuty",
+        "Category": "BizTransaction"
+      },
+      {
+        "Code": "VAR_LEAVE_SUMMARY",
+        "Name": "Leave Summary",
+        "Category": "Report"
+      },
+      {
+        "Code": "VAR_ADJUSTMENT",
+        "Name": "Attendance Adjustment",
+        "Category": "Workflow"
+      }
+    ],
+
+
+    "ReportFields": {
+      "PermissionHourwise": [
+        "Time Slip No",
+        "Attendance Date",
+        "From Time",
+        "To Time",
+        "Duration",
+        "Type",
+        "Reason",
+        "Remarks",
+        "Status"
+      ]
+    },
+
+
+    "BusinessObjects": [
+      "Employee",
+      "Leave",
+      "Permission",
+      "OnDuty",
+      "Attendance",
+      "Leave Balance",
+      "Adjustment Entry"
+    ],
+
+
+    "BusinessRules": [
+      {
+        "Rule": "Employee wise visibility",
+        "Evidence": "Screenshot",
+        "Confidence": "High"
+      },
+      {
+        "Rule": "Leave credit and debit are separately maintained",
+        "Evidence": "Tabs",
+        "Confidence": "High"
+      },
+      {
+        "Rule": "Approval status tracking exists",
+        "Evidence": "Status column",
+        "Confidence": "Medium"
+      }
+    ],
+
+
+    "RolesImpacted": [
+      "Employee",
+      "Manager",
+      "HR Administrator"
+    ],
+
+
+    "ConfigAssessment": {
+      "ConfigRequired": "Unknown",
+      "Reason": "Screenshot alone cannot identify backend configuration."
+    },
+
+
+    "MissingInformationForCompletePIE": [
+      "Database tables",
+      "API/service response",
+      "Backend validation logic",
+      "Approval workflow",
+      "Leave configuration setup",
+      "User permissions",
+      "Competitor comparison"
+    ],
+
+
+    "SalesUnderstanding": {
+      "FeatureExplanation": "Employees and HR users can view complete leave and attendance history including permissions, on-duty requests, leave credits, debits and balances.",
+      "CustomerBenefit": [
+        "Improves employee transparency.",
+        "Reduces HR dependency for leave information.",
+        "Provides audit visibility."
+      ]
+    },
+
+
+    "SourceCoverage": {
+      "Screenshot": true,
+      "Document": true,
+      "BackendCode": false,
+      "Database": false,
+      "SupportTickets": false,
+      "CompetitorIntel": false,
+      "Reports": false
+    }
+  }
+}

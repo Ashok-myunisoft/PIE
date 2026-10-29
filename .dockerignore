@@ -1,0 +1,13 @@
+# Docker build context: only what the two images need (backend code, frontend pages,
+# docker/ files). Secrets (.env), outputs/ and the ERP sources never enter an image.
+*
+!backend/
+!frontend/
+!docker/
+
+backend/tests/
+backend/outputs/
+**/__pycache__/
+**/*.py[cod]
+**/*.bak
+**/.pytest_cache/

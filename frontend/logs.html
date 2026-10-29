@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIE Activity Log</title>
+<meta name="description" content="Every PIE discovery, extraction, mapping, Qdrant ingestion and question: status, counts, errors, and how each answer was reached.">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#dfe3e8; --text:#17202a; --muted:#5b6673;
+  --accent:#2457d6; --accent-soft:#e7eefc; --ok:#1f7a4d; --ok-soft:#e3f4ea; --warn:#9a5b00; --warn-soft:#fdf1dc;
+  --bad:#a33a2b; --bad-soft:#fbe7e3; --run:#2457d6; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --radius:10px; --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+    --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+    --bad:#f08a78; --bad-soft:#3a1d18; --run:#7ea2ff; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+  --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+  --bad:#f08a78; --bad-soft:#3a1d18; --run:#7ea2ff; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:12px;word-break:break-all}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--border)}
+.top-inner{max-width:1600px;margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;min-width:0;margin-right:8px}
+.brand b{font-size:16px}.brand span{color:var(--muted);font-size:12px}
+.appnav{display:flex;gap:2px;flex-wrap:wrap;margin-right:auto}
+.appnav a{padding:6px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+.appnav a:hover{background:var(--surface-2);color:var(--text)}
+.appnav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+input,select{padding:6px 9px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
+.btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 11px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+main{max-width:1600px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--accent-soft);color:var(--accent);border-color:transparent;font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow)}
+.card b{display:block;font-size:22px;font-weight:650;font-variant-numeric:tabular-nums}.card span{color:var(--muted);font-size:12px}
+.card.wide{grid-column:1/-1}
+section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;overflow-x:auto;box-shadow:var(--shadow)}
+h2{font-size:15px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top;white-space:nowrap}
+th{color:var(--muted);font-weight:600;background:var(--surface-2)}
+td.wrap{white-space:normal;max-width:440px;word-break:break-word}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--accent-soft)}
+tr.dim td{color:var(--muted)}
+.s{font-weight:650;font-size:11.5px}
+.SUCCESS,.GREEN,.grounded{color:var(--ok)}.WARNING,.YELLOW,.partial{color:var(--warn)}.FAILED,.RED,.UNREACHABLE,.ERROR,.unverified,.not_found{color:var(--bad)}.RUNNING{color:var(--run)}
+.muted{color:var(--muted)}.num{text-align:right;font-variant-numeric:tabular-nums}
+.gap td{background:var(--warn-soft)}
+.q{display:inline-block;font-family:var(--mono);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin:2px 3px 2px 0}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--surface-2);padding:8px;border-radius:6px;font-size:12px;max-height:360px;overflow:auto}
+#detail{position:fixed;top:0;right:0;bottom:0;width:min(860px,100%);background:var(--surface);border-left:1px solid var(--border);padding:16px;overflow:auto;box-shadow:-8px 0 24px rgba(0,0,0,.18);display:none;z-index:10}
+#detail.open{display:block}
+#err{color:var(--bad);margin:0 0 10px;min-height:1em}
+.steps{list-style:none;margin:8px 0 0;padding:0;counter-reset:step}
+.steps>li{position:relative;padding:0 0 10px 28px;counter-increment:step}
+.steps>li::before{content:counter(step);position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.steps b.sn{text-transform:capitalize}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:2px 10px;font-size:12px;color:var(--muted);margin-top:3px}
+.kv b{color:var(--text);font-weight:500}
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><b>Activity Log</b><span>Every PIE run, question and error</span></div>
+    <nav class="appnav" aria-label="PIE pages"><a href="index.html">Home</a><a href="chat.html">Ask PIE</a><a href="catalog.html">Feature Catalog</a><a href="fields.html">Field Explorer</a><a href="relations.html">Relationships</a><a href="logs.html" aria-current="page">Activity Log</a></nav>
+    <select id="hours" title="Time window"><option value="1">Last hour</option><option value="24" selected>Last 24 h</option><option value="168">Last 7 days</option><option value="720">Last 30 days</option></select>
+    <label class="muted" style="font-size:12px"><input type="checkbox" id="auto" checked> auto-refresh</label>
+    <input id="token" type="password" placeholder="Log token" autocomplete="off" size="12" aria-label="Log token">
+    <button class="btn" id="save" type="button">Save token</button>
+    <button class="btn primary" id="reload" type="button">Refresh</button>
+  </div>
+</header>
+<main>
+  <div id="err" role="alert"></div>
+  <div class="tabs" role="tablist">
+    <button data-tab="overview" aria-selected="true">Overview</button>
+    <button data-tab="runs" aria-selected="false">Runs</button>
+    <button data-tab="questions" aria-selected="false">Questions</button>
+    <button data-tab="knowledge" aria-selected="false">Knowledge inventory</button>
+    <button data-tab="qdrant" aria-selected="false">Qdrant storage</button>
+    <button data-tab="api" aria-selected="false">API requests</button>
+  </div>
+  <div id="p-overview" class="panel">
+    <div class="cards" id="cards"></div>
+    <section><h2>By activity</h2><table id="t-acts"></table></section>
+    <section><h2>Recent failures</h2><table id="t-fail"></table></section>
+  </div>
+  <div id="p-runs" class="panel" hidden>
+    <section>
+      <div class="filters">
+        <select id="f-activity"><option value="">All activities</option></select>
+        <select id="f-status"><option value="">All statuses</option><option>SUCCESS</option><option>WARNING</option><option>FAILED</option><option>RUNNING</option></select>
+        <input id="f-module" placeholder="Module" size="10">
+        <input id="f-q" placeholder="Search command, screen, error, question" size="32">
+        <label class="muted" style="font-size:12px"><input type="checkbox" id="f-top"> top-level only</label>
+        <button class="btn" id="f-go" type="button">Apply</button>
+        <span class="muted" id="f-total"></span>
+      </div>
+      <table id="t-runs"></table>
+      <p><button class="btn" id="more" type="button" hidden>Load more</button></p>
+    </section>
+  </div>
+  <div id="p-questions" class="panel" hidden>
+    <section><h2>Questions asked in Ask PIE <span class="muted" style="font-weight:400;font-size:12px">click one to see how the answer was reached</span></h2><table id="t-questions"></table></section>
+  </div>
+  <div id="p-knowledge" class="panel" hidden>
+    <section><h2>Modules <button class="btn" id="inv-refresh" type="button">Rebuild inventory</button> <span class="muted" id="inv-time" style="font-weight:400;font-size:12px"></span></h2><table id="t-mods"></table></section>
+    <section><h2>Screens, sections and fields</h2>
+      <div class="filters"><select id="k-module"><option value="">All modules</option></select>
+        <label class="muted" style="font-size:12px"><input type="checkbox" id="k-gaps"> only screens with gaps (missing in Qdrant or no backend)</label></div>
+      <table id="t-screens"></table></section>
+  </div>
+  <div id="p-qdrant" class="panel" hidden>
+    <div class="cards" id="q-cards"></div>
+    <section><h2>Points by module and knowledge type <button class="btn" id="q-refresh" type="button">Check Qdrant now</button></h2><table id="t-qmatrix"></table></section>
+    <section><h2>Status history</h2><table id="t-qhist"></table></section>
+  </div>
+  <div id="p-api" class="panel" hidden>
+    <section><h2>Requests by endpoint</h2><table id="t-api"></table></section>
+  </div>
+</main>
+<aside id="detail" aria-label="Run detail"><button class="btn" id="close" type="button">Close</button><div id="d-body"></div></aside>
+<script>
+(() => {
+  "use strict";
+  const ROOT = ((window.PIE_CONFIG && window.PIE_CONFIG.apiBase) || "/usage/").replace(/usage\/?$/, "");
+  const LOGS = ROOT + "logs/api/";
+  const ACTIVITIES = ["module_discovery", "screen_discovery", "field_discovery", "field_knowledge", "knowledge_extraction",
+    "evidence_mapping", "qdrant_ingestion", "qdrant_status", "knowledge_inventory", "retrieval", "export", "other"];
+  const $ = id => document.getElementById(id);
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+  const num = v => v == null || v === "" ? "-" : Number(v).toLocaleString();
+  const when = t => t ? new Date(t).toLocaleString() : "-";
+  const dur = ms => ms == null ? "-" : ms < 1000 ? ms + " ms" : ms < 120000 ? (ms / 1000).toFixed(1) + " s" : (ms / 60000).toFixed(1) + " min";
+  const badge = s => `<span class="s ${esc(s)}">${esc(s)}</span>`;
+  const label = a => String(a || "").replace(/_/g, " ");
+  const card = (v, l, cls = "") => `<div class="card"><b class="${esc(cls)}">${v}</b><span>${esc(l)}</span></div>`;
+  try { const th = JSON.parse(localStorage.getItem("pie-rel:theme") || '""'); if (th) document.documentElement.setAttribute("data-theme", th); } catch (e) {}
+  let token = "";
+  try { token = localStorage.getItem("pieLogToken") || ""; } catch (e) {}
+  $("token").value = token;
+  let tab = "overview", offset = 0, timer = null, inv = null;
+
+  async function api(path, method = "GET") {
+    const r = await fetch(LOGS + path, {method, headers: {"X-PIE-Log-Token": token}});
+    if (!r.ok) {
+      if (r.status === 401) throw new Error("Wrong or missing log token. Enter it at the top right and press Save token.");
+      let msg = r.status + " " + r.statusText;
+      try { msg += ": " + ((await r.json()).detail || ""); } catch (e) {}
+      throw new Error(msg);
+    }
+    return r.json();
+  }
+  function table(el, head, rows, empty = "Nothing recorded yet.") {
+    $(el).innerHTML = `<thead><tr>${head.map(h => `<th${h.startsWith("#") ? ' class="num"' : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead>` +
+      `<tbody>${rows.length ? rows.join("") : `<tr><td colspan="${head.length}" class="muted">${esc(empty)}</td></tr>`}</tbody>`;
+  }
+  const headline = c => Object.entries(c || {}).filter(([, v]) => v).slice(0, 4).map(([k, v]) => `${esc(k)}: <b>${num(v)}</b>`).join(" &middot; ");
+  const RUN_HEAD = ["Started", "Status", "Activity", "Command", "Module", "Screen / question", "#Duration", "Counts", "Error", "Source"];
+  const runRow = r => `<tr class="click" data-run="${esc(r.run_id)}"><td>${when(r.started_at)}</td><td>${badge(r.status)}</td><td>${esc(label(r.activity))}</td>` +
+    `<td><code>${esc(r.command)}</code>${r.parent_id ? ' <span class="muted">(sub)</span>' : ""}</td><td>${esc(r.module || "")}</td>` +
+    `<td class="wrap">${esc(r.screen || (r.attrs && r.attrs.question) || "")}</td>` +
+    `<td class="num">${dur(r.duration_ms)}</td><td class="wrap">${headline(r.counts)}</td><td class="wrap FAILED">${esc(r.error_message || "")}</td>` +
+    `<td class="muted">${esc(r.source)} @ ${esc(r.host)}</td></tr>`;
+
+  async function overview() {
+    const s = await api("summary?hours=" + $("hours").value);
+    const t = s.totals, c = s.chat || {}, a = s.api || {}, q = s.qdrant;
+    $("cards").innerHTML = [
+      card(num(t.runs), "runs"), card(num(t.SUCCESS), "succeeded", "SUCCESS"), card(num(t.WARNING), "warnings", "WARNING"),
+      card(num(t.FAILED), "failed", "FAILED"), card(num(t.RUNNING), "running now", "RUNNING"),
+      card(num(c.questions), "chat questions"), card(c.avg_seconds == null ? "-" : c.avg_seconds.toFixed(1) + " s", "avg answer time"),
+      card(c.questions ? Math.round(100 * (c.grounded || 0) / c.questions) + "%" : "-", "answers grounded"),
+      card(num(a.requests), "API requests"), card(num(a.server_errors), "API 5xx errors", a.server_errors ? "FAILED" : ""),
+      card(q ? num(q.points) : "-", q ? "Qdrant points (" + q.status + ")" : "Qdrant not checked yet", q ? q.status : ""),
+      card(num(s.staleRunning), "stuck RUNNING > 6 h", s.staleRunning ? "WARNING" : ""),
+    ].join("");
+    table("t-acts", ["Activity", "#Runs", "#Success", "#Warning", "#Failed", "#Running", "#Avg time", "Last run", "Last success", "Last failure"],
+      s.activities.map(x => `<tr class="click" data-activity="${esc(x.activity)}"><td>${esc(label(x.activity))}</td><td class="num">${num(x.total)}</td>` +
+        `<td class="num SUCCESS">${num(x.SUCCESS)}</td><td class="num WARNING">${num(x.WARNING)}</td><td class="num FAILED">${num(x.FAILED)}</td>` +
+        `<td class="num">${num(x.RUNNING)}</td><td class="num">${dur(x.avgMs)}</td><td>${when(x.lastRun)}</td><td>${when(x.lastSuccess)}</td><td>${when(x.lastFailure)}</td></tr>`),
+      "No activity in this time window.");
+    table("t-fail", ["Started", "Activity", "Command", "Module", "Screen", "Error", "Host"],
+      s.recentFailures.map(r => `<tr class="click" data-run="${esc(r.run_id)}"><td>${when(r.started_at)}</td><td>${esc(label(r.activity))}</td><td><code>${esc(r.command)}</code></td>` +
+        `<td>${esc(r.module || "")}</td><td>${esc(r.screen || "")}</td><td class="wrap FAILED">${esc((r.error_type || "") + ": " + (r.error_message || ""))}</td><td>${esc(r.host || "")}</td></tr>`),
+      "No failures in this time window.");
+  }
+
+  async function runs(append = false) {
+    if (!append) offset = 0;
+    const p = new URLSearchParams({limit: "100", offset: String(offset), hours: $("hours").value});
+    for (const [k, id] of [["activity", "f-activity"], ["status", "f-status"], ["module", "f-module"], ["q", "f-q"]]) {
+      if ($(id).value.trim()) p.set(k, $(id).value.trim());
+    }
+    if ($("f-top").checked) p.set("top", "true");
+    const res = await api("runs?" + p);
+    if (append) $("t-runs").tBodies[0].insertAdjacentHTML("beforeend", res.runs.map(runRow).join(""));
+    else table("t-runs", RUN_HEAD, res.runs.map(runRow), "No runs match.");
+    offset += res.runs.length;
+    $("f-total").textContent = `${offset} of ${res.total} runs`;
+    $("more").hidden = offset >= res.total;
+  }
+
+  async function questions() {
+    const res = await api("runs?activity=retrieval&limit=200&hours=" + $("hours").value);
+    const rows = res.runs.filter(r => r.command === "chat");
+    table("t-questions", ["Asked", "Question", "For", "Intent", "Grounding", "Written by", "#Retrieved", "#Cited", "#Seconds", "Status"],
+      rows.map(r => { const a = r.attrs || {}, c = r.counts || {};
+        return `<tr class="click" data-run="${esc(r.run_id)}"><td>${when(r.started_at)}</td><td class="wrap"><b>${esc(a.question || "")}</b>` +
+          `${a.answerPreview ? `<div class="muted">${esc(a.answerPreview.slice(0, 160))}…</div>` : ""}</td><td>${esc(a.audience || "Marketing Team")}</td><td>${esc(a.intent || "")}</td>` +
+          `<td>${badge(a.grounding || "")}</td><td>${esc(a.generator || "")}</td><td class="num">${num(c.retrievedItems)}</td><td class="num">${num(c.citedItems)}</td>` +
+          `<td class="num">${c.totalSeconds == null ? "-" : c.totalSeconds}</td><td>${badge(r.status)}${r.error_message ? `<div class="FAILED">${esc(r.error_message)}</div>` : ""}</td></tr>`; }),
+      "No questions in this time window.");
+  }
+
+  async function knowledge() {
+    inv = await api("inventory");
+    $("inv-time").textContent = inv.updatedAt ? "built " + when(inv.updatedAt) : "not built yet - press Rebuild inventory";
+    const sel = $("k-module"), cur = sel.value;
+    sel.innerHTML = '<option value="">All modules</option>' + inv.modules.map(m => `<option${m.module === cur ? " selected" : ""}>${esc(m.module)}</option>`).join("");
+    const st = (m, k) => (m.stats || {})[k];
+    table("t-mods", ["Module", "#Screens", "#Screens with APIs", "#API links to DB", "DB metadata", "#Features", "#Capabilities", "#Ready", "#Field screens", "#Fields", "#Qdrant points", "Updated"],
+      inv.modules.map(m => `<tr><td><b>${esc(m.module)}</b></td><td class="num">${num(st(m, "api.screens"))}</td><td class="num">${num(st(m, "api.screensWithApis"))}</td>` +
+        `<td class="num">${num(st(m, "db.apiMappingsWithDatabase"))} / ${num(st(m, "db.apiMappings"))}</td><td>${esc(m.db_source || "-")}</td>` +
+        `<td class="num">${num(st(m, "usage.features"))}</td><td class="num">${num(st(m, "usage.capabilities"))}</td><td class="num">${num(st(m, "usage.ready"))}</td>` +
+        `<td class="num">${num(m.field_screens)}</td><td class="num">${num(m.fields)}</td><td class="num">${num(m.qdrant_points)}</td><td>${when(m.updated_at)}</td></tr>`),
+      "No module outputs found.");
+    screens();
+  }
+  function screens() {
+    if (!inv) return;
+    const mod = $("k-module").value, gaps = $("k-gaps").checked;
+    const gap = s => s.qdrant_fields != null && s.qdrant_fields < (s.unique_fields || s.fields);
+    const rows = inv.screens.filter(s => (!mod || s.module === mod) && (!gaps || gap(s) || !s.backend_found));
+    table("t-screens", ["Module", "Screen", "Entity / table", "Backend", "#Sections", "#Sections in Qdrant", "#Fields", "#Unique", "#Fields in Qdrant",
+      "#Mandatory", "#Mapped to column", "#Explained", "#Flagged", "Generated", ""],
+      rows.map(s => `<tr class="${gap(s) ? "gap" : ""}"><td>${esc(s.module)}</td><td><b>${esc(s.screen)}</b><div class="muted">${esc(s.screen_id || "")}</div></td>` +
+        `<td>${esc(s.entity || "-")}${s.tbl ? " / " + esc(s.tbl) : ""}</td><td>${s.backend_found ? "found" : '<span class="WARNING">not found</span>'}</td>` +
+        `<td class="num">${num(s.sections)}</td><td class="num">${num(s.qdrant_sections)}</td><td class="num">${num(s.fields)}</td><td class="num">${num(s.unique_fields)}</td>` +
+        `<td class="num">${num(s.qdrant_fields)}</td><td class="num">${num(s.mandatory)}</td><td class="num">${num(s.mapped_to_column)}</td>` +
+        `<td class="num">${num(s.explained)}</td><td class="num">${num(s.flagged)}</td><td>${when(s.generated_at)}</td>` +
+        `<td>${s.screen_id ? `<a href="relations.html?screen=${encodeURIComponent(s.screen_id)}">relationships</a>` : ""}</td></tr>`),
+      "No field dictionaries found.");
+  }
+
+  async function qdrant() {
+    const h = await api("qdrant?limit=48"), q = h.latest;
+    if (!q) {
+      $("q-cards").innerHTML = card("-", "No status yet - press Check Qdrant now");
+      table("t-qmatrix", ["Module"], []);
+      table("t-qhist", ["Checked"], []);
+      return;
+    }
+    $("q-cards").innerHTML = [card(esc(q.status), "collection " + q.collection, q.status), card(num(q.points), "points"),
+      card(num(q.indexed_vectors), "indexed vectors"), card(num(q.segments), "segments"), card(when(q.ts), "checked")].join("") +
+      (q.error ? `<div class="card wide"><span class="FAILED">${esc(q.error)}</span></div>` : "");
+    const types = Object.keys(q.by_type || {});
+    const mods = Object.entries(q.by_module || {}).sort((a, b) => b[1].points - a[1].points);
+    table("t-qmatrix", ["Module", "#Total", ...types.map(t => "#" + t)],
+      mods.map(([m, v]) => `<tr><td><b>${esc(m || "(no module)")}</b></td><td class="num">${num(v.points)}</td>${types.map(t => `<td class="num">${num((v.types || {})[t])}</td>`).join("")}</tr>`)
+        .concat(mods.length ? [`<tr><td><b>All</b></td><td class="num"><b>${num(q.points)}</b></td>${types.map(t => `<td class="num"><b>${num(q.by_type[t])}</b></td>`).join("")}</tr>`] : []));
+    table("t-qhist", ["Checked", "Status", "#Points", "Error"],
+      h.history.map(x => `<tr><td>${when(x.ts)}</td><td>${badge(x.status)}</td><td class="num">${num(x.points)}</td><td class="wrap">${esc(x.error || "")}</td></tr>`));
+  }
+
+  async function apiTab() {
+    const s = await api("api-requests?hours=" + $("hours").value);
+    table("t-api", ["Method", "Path", "#Requests", "#Errors", "#Avg", "#Max", "Last"],
+      s.paths.map(p => `<tr><td>${esc(p.method)}</td><td class="wrap"><code>${esc(p.path)}</code></td><td class="num">${num(p.requests)}</td>` +
+        `<td class="num ${p.errors ? "FAILED" : ""}">${num(p.errors)}</td><td class="num">${dur(p.avg_ms)}</td><td class="num">${dur(p.max_ms)}</td><td>${when(p.last)}</td></tr>`),
+      "No API requests in this time window.");
+  }
+
+  // ---- how an answer was reached (stored with each chat run)
+  function kvRows(o, skip) {
+    const rows = Object.entries(o).filter(([k, v]) => !skip.includes(k) && v !== "" && v != null && !(Array.isArray(v) && !v.length) && v !== false);
+    return rows.length ? `<div class="kv">${rows.map(([k, v]) => `<span>${esc(k)}</span><b>${Array.isArray(v)
+      ? v.map(x => `<span class="q">${esc(typeof x === "object" ? (x.label || x.route || x.title || JSON.stringify(x)) + (x.matchedWord ? ` ("${x.matchedWord}")` : "") + (x.items != null ? `: ${x.items}` : "") : x)}</span>`).join("")
+      : esc(typeof v === "object" ? JSON.stringify(v) : v)}</b>`).join("")}</div>` : "";
+  }
+  function traceHtml(tr) {
+    const items = tr.retrieved || [];
+    return `<h3>How the answer was reached</h3><ol class="steps">${(tr.steps || []).map(s => `<li><b class="sn">${esc(s.step)}</b> <span>${esc(s.summary)}</span>${kvRows(s, ["step", "summary"])}</li>`).join("")}</ol>
+      <h3>Knowledge items (${items.length}, ${items.filter(i => i.cited).length} cited)</h3>
+      <table><thead><tr><th>Ref</th><th>Used</th><th>Status</th><th>Type</th><th>Knowledge</th><th>Module</th><th>Found by</th><th class="num">Score</th></tr></thead><tbody>
+      ${items.map(i => `<tr class="${i.cited ? "" : "dim"}"><td><b>${esc(i.ref || "")}</b></td><td>${i.cited ? '<span class="SUCCESS">cited</span>' : "not used"}</td><td>${esc(i.status || "")}</td>
+        <td>${esc(i.knowledgeType || i.kind || "")}</td><td class="wrap">${esc(i.title)}${i.screenId ? ` <a href="relations.html?screen=${encodeURIComponent(i.screenId)}">relationships</a>` : ""}</td>
+        <td>${esc(i.module || "")}</td><td class="wrap">${esc(i.route || "")}</td><td class="num">${i.score == null ? "" : Number(i.score).toFixed(3)}</td></tr>`).join("")}
+      </tbody></table>`;
+  }
+
+  async function detail(id) {
+    const r = await api("runs/" + encodeURIComponent(id));
+    const kv = o => Object.keys(o || {}).length
+      ? `<table>${Object.entries(o).map(([k, v]) => `<tr><td class="muted">${esc(k)}</td><td class="wrap">${esc(typeof v === "object" ? JSON.stringify(v) : v)}</td></tr>`).join("")}</table>`
+      : '<p class="muted">none</p>';
+    const traceEv = r.events.find(e => e.data && e.data.trace);
+    const events = r.events.filter(e => e !== traceEv);
+    $("d-body").innerHTML = `<h2>${badge(r.status)} ${esc(label(r.activity))} - <code>${esc(r.command)}</code></h2>` +
+      (r.attrs && r.attrs.question ? `<p><b>${esc(r.attrs.question)}</b></p>` : "") +
+      `<p class="muted">Run ${esc(r.run_id)}${r.parent_id ? ` &middot; part of <a href="#" data-run="${esc(r.parent_id)}">${esc(r.parent_id.slice(0, 12))}</a>` : ""}<br>` +
+      `${when(r.started_at)} &rarr; ${when(r.finished_at)} (${dur(r.duration_ms)}) &middot; ${esc(r.source)} on ${esc(r.host)} (pid ${esc(r.pid)})` +
+      `${r.module ? " &middot; module " + esc(r.module) : ""}${r.screen ? " &middot; screen " + esc(r.screen) : ""}</p>` +
+      (r.error_message ? `<h3 class="FAILED">${esc(r.error_type)}: ${esc(r.error_message)}</h3><pre>${esc(r.traceback || "")}</pre>` : "") +
+      (traceEv ? traceHtml(traceEv.data.trace) : "") +
+      `<h3>Record counts</h3>${kv(r.counts)}<h3>Details</h3>${kv(r.attrs)}<h3>Parameters</h3><pre>${esc(JSON.stringify(r.params, null, 1))}</pre>` +
+      (r.children.length ? `<h3>Sub-activities</h3><table>${r.children.map(c => `<tr class="click" data-run="${esc(c.run_id)}"><td>${badge(c.status)}</td>` +
+        `<td>${esc(label(c.activity))}</td><td>${dur(c.duration_ms)}</td><td class="wrap">${headline(c.counts)} ${esc(c.error_message || "")}</td></tr>`).join("")}</table>` : "") +
+      `<h3>Events (${events.length})</h3>` + (events.length
+        ? `<table>${events.map(e => `<tr><td class="muted">${new Date(e.ts).toLocaleTimeString()}</td><td>${badge(e.level)}</td>` +
+          `<td class="wrap">${esc(e.message)}${e.data ? ` <span class="muted">${esc(JSON.stringify(e.data).slice(0, 400))}</span>` : ""}</td></tr>`).join("")}</table>`
+        : '<p class="muted">none</p>');
+    $("detail").classList.add("open");
+  }
+
+  const LOADERS = {overview, runs: () => runs(), questions, knowledge, qdrant, api: apiTab};
+  const showErr = e => { $("err").textContent = e.message || String(e); };
+  async function load() {
+    $("err").textContent = "";
+    try { await LOADERS[tab](); } catch (e) { showErr(e); }
+  }
+  function show(name) {
+    tab = name;
+    document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
+    document.querySelectorAll(".panel").forEach(p => { p.hidden = p.id !== "p-" + name; });
+    load();
+  }
+  document.addEventListener("click", e => {
+    const run = e.target.closest("[data-run]");
+    if (run) { e.preventDefault(); detail(run.dataset.run).catch(showErr); return; }
+    const act = e.target.closest("[data-activity]");
+    if (act) { $("f-activity").value = act.dataset.activity; show("runs"); }
+  });
+  document.querySelectorAll(".tabs button").forEach(b => { b.onclick = () => show(b.dataset.tab); });
+  $("f-activity").insertAdjacentHTML("beforeend", ACTIVITIES.map(a => `<option value="${a}">${label(a)}</option>`).join(""));
+  $("f-go").onclick = () => runs().catch(showErr);
+  $("f-q").onkeydown = e => { if (e.key === "Enter") runs().catch(showErr); };
+  $("more").onclick = () => runs(true).catch(showErr);
+  $("k-module").onchange = screens;
+  $("k-gaps").onchange = screens;
+  $("hours").onchange = load;
+  $("reload").onclick = load;
+  $("close").onclick = () => { $("detail").classList.remove("open"); if (location.hash) history.replaceState(null, "", location.pathname); };
+  $("save").onclick = () => {
+    token = $("token").value.trim();
+    try { localStorage.setItem("pieLogToken", token); } catch (e) {}
+    load();
+  };
+  $("inv-refresh").onclick = async () => {
+    $("inv-time").textContent = "rebuilding...";
+    try { await api("inventory/refresh", "POST"); await knowledge(); } catch (e) { showErr(e); }
+  };
+  $("q-refresh").onclick = async () => {
+    try { await api("qdrant/refresh", "POST"); await qdrant(); } catch (e) { showErr(e); }
+  };
+  function schedule() {
+    clearInterval(timer);
+    if ($("auto").checked) timer = setInterval(() => { if (!document.hidden && tab !== "runs" && !$("detail").classList.contains("open")) load(); }, 30000);
+  }
+  $("auto").onchange = schedule;
+  schedule();
+  load();
+  // logs.html#run=<id> (linked from an answer in Ask PIE) opens that run.
+  const m = location.hash.match(/run=([0-9a-f]{6,32})/);
+  if (m) detail(m[1]).catch(showErr);
+})();
+</script>
+</body>
+</html>

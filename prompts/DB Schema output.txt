@@ -1,0 +1,148 @@
+{
+  "ModuleCode": "HR_LEAVE_MANAGEMENT",
+  "ModuleName": "Leave Management",
+  "SourceType": "Database Schema Mining",
+
+  "BusinessArea": "Human Resource Management",
+
+  "Description": "Employee leave application and approval transaction management module.",
+
+  "Tables": [
+    {
+      "TableName": "TLeave",
+      "TableType": "Transaction Header",
+
+      "BusinessPurpose": "Stores the main leave request information submitted by employees.",
+
+      "KeyFields": [
+        {
+          "Column": "LEAVEID",
+          "Purpose": "Unique identifier for leave transaction"
+        },
+        {
+          "Column": "LEAVENUMBER",
+          "Purpose": "Unique leave request reference number"
+        },
+        {
+          "Column": "EMPLOYEEID",
+          "Purpose": "Employee who requested leave",
+          "Source": "Available through TLeaveDetail"
+        },
+        {
+          "Column": "NUMBEROFDAYS",
+          "Purpose": "Total leave duration requested"
+        },
+        {
+          "Column": "STATUS",
+          "Purpose": "Current leave request status"
+        },
+        {
+          "Column": "REMARKS",
+          "Purpose": "Employee remarks or comments"
+        }
+      ]
+    },
+
+
+    {
+      "TableName": "TLeaveDetail",
+      "TableType": "Transaction Detail",
+
+      "BusinessPurpose": "Stores individual leave dates and leave breakup information.",
+
+      "KeyFields": [
+        {
+          "Column": "EMPLOYEEID",
+          "Purpose": "Employee applying leave"
+        },
+        {
+          "Column": "LEAVETYPEID",
+          "Purpose": "Type of leave applied"
+        },
+        {
+          "Column": "LEAVEDATE",
+          "Purpose": "Individual leave date"
+        },
+        {
+          "Column": "NUMBEROFDAYS",
+          "Purpose": "Leave duration for the selected date"
+        },
+        {
+          "Column": "LEAVESTATUS",
+          "Purpose": "Approval status of individual leave entry"
+        },
+        {
+          "Column": "DAYTYPE",
+          "Purpose": "Full day / Half day classification"
+        }
+      ]
+    }
+  ],
+
+
+  "BusinessProcessFlow": [
+    "Employee selects leave type",
+    "Employee enters leave dates",
+    "System calculates leave duration",
+    "Leave request is submitted",
+    "Approver reviews request",
+    "Leave status gets updated",
+    "Leave balance gets adjusted"
+  ],
+
+
+  "PossibleUIComponents": [
+    "Employee Leave Application Screen",
+    "Leave Calendar",
+    "Leave Type Dropdown",
+    "Leave Date Picker",
+    "Approval Status Indicator",
+    "Remarks Field"
+  ],
+
+
+  "DerivedBusinessRules": [
+    {
+      "Rule": "Leave can contain multiple dates",
+      "Reason": "TLeave header connected with TLeaveDetail"
+    },
+    {
+      "Rule": "System supports different leave categories",
+      "Reason": "LEAVETYPEID field exists"
+    },
+    {
+      "Rule": "System supports half-day leave",
+      "Reason": "DAYTYPE field exists"
+    },
+    {
+      "Rule": "Leave approval workflow exists",
+      "Reason": "STATUS and LEAVESTATUS fields exist"
+    }
+  ],
+
+
+  "SalesUnderstanding": {
+
+    "FeatureName": "Employee Leave Management",
+
+    "CustomerValue": [
+      "Automates employee leave requests",
+      "Reduces manual HR processing",
+      "Provides approval workflow visibility",
+      "Maintains accurate leave history"
+    ],
+
+    "TargetUsers": [
+      "Employees",
+      "HR Team",
+      "Reporting Managers"
+    ],
+
+    "IndustryRelevance": [
+      "Manufacturing",
+      "IT Services",
+      "SME Organizations",
+      "Large Enterprises"
+    ]
+  }
+}

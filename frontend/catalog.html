@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIE Feature Catalog</title>
+<meta name="description" content="Evidence-backed product feature catalog for the Marketing team (PIE Usage Phase v0.19).">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#dfe3e8; --text:#17202a; --muted:#5b6673;
+  --accent:#2457d6; --accent-soft:#e7eefc; --ok:#1f7a4d; --ok-soft:#e3f4ea; --warn:#9a5b00; --warn-soft:#fdf1dc;
+  --bad:#a33a2b; --bad-soft:#fbe7e3; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --radius:10px; --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+    --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+    --bad:#f08a78; --bad-soft:#3a1d18; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --surface:#171c23; --surface-2:#1e252e; --border:#2b333e; --text:#e6eaef; --muted:#9aa5b1;
+  --accent:#7ea2ff; --accent-soft:#1d2a47; --ok:#5fcf97; --ok-soft:#15301f; --warn:#f0b44c; --warn-soft:#352812;
+  --bad:#f08a78; --bad-soft:#3a1d18; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--border)}
+.top-inner{max-width:1360px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;margin-right:8px;min-width:0}
+.appnav{display:flex;gap:2px;flex-wrap:wrap;margin-right:auto}
+.appnav a{padding:6px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+.appnav a:hover{background:var(--surface-2);color:var(--text)}
+.appnav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+
+.brand b{font-size:16px}
+.brand span{color:var(--muted);font-size:12px}
+.search{position:relative;flex:1 1 260px;max-width:420px}
+.search input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
+.search input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
+.btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.small{padding:4px 9px;font-size:12px}
+
+main{max-width:1360px;margin:0 auto;padding:16px}
+.policy{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;color:var(--muted);font-size:13px}
+.policy strong{color:var(--text)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow)}
+.stat .v{font-size:24px;font-weight:650;font-variant-numeric:tabular-nums}
+.stat .l{color:var(--muted);font-size:12px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{background:none;border:0;padding:9px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--text);border-color:var(--accent);font-weight:600}
+
+.layout{display:grid;grid-template-columns:250px 1fr;gap:16px;align-items:start}
+aside.filters{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;position:sticky;top:76px}
+.fgroup{margin-bottom:14px}
+.fgroup h3{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.fopt{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;border:0;background:none;padding:5px 8px;border-radius:6px;cursor:pointer}
+.fopt:hover{background:var(--surface-2)}
+.fopt[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.fopt .n{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;color:var(--muted)}
+.toolbar .spacer{margin-left:auto}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;width:100%}
+.card:hover{border-color:var(--accent)}
+.card h4{margin:0;font-size:15px}
+.meta{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px}
+.badge.READY{background:var(--ok-soft);color:var(--ok)}
+.badge.PARTIAL{background:var(--warn-soft);color:var(--warn)}
+.badge.NEEDS_EVIDENCE{background:var(--bad-soft);color:var(--bad)}
+.claims{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.claims li{display:flex;gap:7px;align-items:flex-start;font-size:13px}
+.mark{flex:none;width:16px;height:16px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;margin-top:2px}
+.mark.VERIFIED{background:var(--ok-soft);color:var(--ok)}
+.mark.REVIEW{background:var(--warn-soft);color:var(--warn)}
+.card .desc{color:var(--muted);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .foot{margin-top:auto;color:var(--muted);font-size:12px}
+
+.caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.cap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.cap h4{margin:0;font-size:16px}
+.bar{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--surface-2)}
+.bar i{display:block;height:100%}
+.bar .r{background:var(--ok)} .bar .p{background:var(--warn)} .bar .e{background:var(--bad)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:0}
+.legend .r::before{background:var(--ok)} .legend .p::before{background:var(--warn)} .legend .e::before{background:var(--bad)}
+.cap .feat-list{color:var(--muted);font-size:13px}
+
+.drawer-bg{position:fixed;inset:0;background:rgba(10,14,20,.45);z-index:20;display:none}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(620px,100%);background:var(--surface);z-index:21;border-left:1px solid var(--border);display:none;flex-direction:column}
+.drawer.open,.drawer-bg.open{display:flex}
+.drawer-bg.open{display:block}
+.dhead{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.dhead h2{margin:0 0 6px;font-size:19px}
+.dbody{padding:16px 18px;overflow:auto;flex:1}
+.dfoot{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+section.block{margin-bottom:18px}
+section.block h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.claim-row{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.claim-row .t{display:flex;gap:8px;align-items:flex-start}
+.ev{margin:6px 0 0 24px;padding:0;list-style:none;font-size:12px;color:var(--muted)}
+.ev code,.tech code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;word-break:break-all}
+.note{border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.note.info{background:var(--accent-soft);color:var(--accent)}
+details.tech summary{cursor:pointer;color:var(--muted);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+label.inline{display:inline-flex;gap:6px;align-items:center;cursor:pointer;font-size:13px}
+.filters-toggle{display:none}
+
+@media (max-width: 860px){
+  .layout{grid-template-columns:1fr}
+  aside.filters{position:static;display:none}
+  aside.filters.open{display:block}
+  .filters-toggle{display:inline-block}
+  .brand{margin-right:0;flex-basis:100%}
+  .search{max-width:none}
+}
+</style>
+<!--PIE_EMBEDDED_DATA-->
+<script src="config.js"></script>
+<script src="modules.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><b>Product Feature Catalog</b><span id="subtitle">PIE Usage Phase · evidence-backed feature knowledge</span></div>
+    <nav class="appnav" id="appnav" aria-label="PIE pages"><a href="index.html">Home</a><a href="chat.html">Ask PIE</a><a href="catalog.html" aria-current="page">Feature Catalog</a><a href="fields.html">Field Explorer</a><a href="relations.html">Relationships</a><a href="logs.html">Activity Log</a><a href="intelligence.html">Department Knowledge</a></nav>
+    <div id="modules"></div>
+    <div class="search"><label class="sr-only" for="q">Search features</label><input id="q" type="search" placeholder="Search features, capabilities, highlights…" autocomplete="off"></div>
+    <button class="btn" id="theme" type="button" aria-label="Toggle colour theme">◐</button>
+  </div>
+</header>
+
+<main>
+  <div class="policy" role="note">
+    <span><span class="mark VERIFIED" aria-hidden="true">✓</span> <strong>Verified</strong>: traced to source (forms, business logic, services, data). OK for copy with normal review.</span>
+    <span><span class="mark REVIEW" aria-hidden="true">!</span> <strong>Needs review</strong>: inferred or AI-drafted. Get product sign-off before publishing.</span>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-caps" aria-selected="true" aria-controls="view-caps">Capabilities</button>
+    <button class="tab" role="tab" id="tab-feats" aria-selected="false" aria-controls="view-feats">Features</button>
+  </div>
+
+  <div id="view-caps" role="tabpanel" aria-labelledby="tab-caps"><div class="caps" id="caps"></div></div>
+
+  <div id="view-feats" role="tabpanel" aria-labelledby="tab-feats" hidden>
+    <div class="layout">
+      <aside class="filters" id="filters" aria-label="Filters"></aside>
+      <div>
+        <div class="toolbar">
+          <button class="btn small filters-toggle" id="filters-toggle" type="button" aria-expanded="false" aria-controls="filters">Filters</button>
+          <span id="count"></span>
+          <span class="spacer"></span>
+          <label class="inline"><input type="checkbox" id="ready-only"> Marketing-ready only</label>
+          <button class="btn small" id="csv" type="button">Download feature sheet (CSV)</button>
+        </div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="drawer-bg" id="drawer-bg"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title">
+  <div class="dhead">
+    <div style="flex:1;min-width:0"><h2 id="d-title"></h2><div class="meta" id="d-meta"></div></div>
+    <button class="btn small" id="d-close" type="button" aria-label="Close">✕</button>
+  </div>
+  <div class="dbody" id="d-body"></div>
+  <div class="dfoot">
+    <button class="btn primary" id="d-copy" type="button">Copy verified blurb</button>
+    <button class="btn" id="d-link" type="button">Copy link</button>
+    <label class="inline"><input type="checkbox" id="d-include-ai"> Include AI-drafted description</label>
+  </div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+  const READINESS = {READY:"Marketing-ready", PARTIAL:"Partially verified", NEEDS_EVIDENCE:"Needs evidence"};
+  const READINESS_HELP = {
+    READY:"Confirmed screen with at least two verified highlights.",
+    PARTIAL:"At least one verified highlight; more evidence would strengthen it.",
+    NEEDS_EVIDENCE:"No verified highlight yet. Do not market without product input."
+  };
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem("pie-usage:"+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem("pie-usage:"+k, JSON.stringify(v)); }catch(e){} }
+  };
+  const $ = id => document.getElementById(id);
+  // Backend address: an exported file's embedded setting, else frontend/config.js.
+  const API = (b => b && !b.endsWith("/") ? b + "/" : b)((window.__PIE_CHAT__ && window.__PIE_CHAT__.apiBase) || (window.PIE_CONFIG && window.PIE_CONFIG.apiBase) || "");
+  // The chat needs the PIE server; the standalone export has no chat to link to.
+  // The standalone export has no server: its links to other PIE pages would not work.
+  if (Array.isArray(window.__PIE_USAGE__)) $("appnav").hidden = true;
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  const state = {
+    catalogs: {}, modules: [], selected: [], merged: null, picker: null,
+    q: "", capability: store.get("capability", ""), category: "", readiness: "",
+    readyOnly: store.get("readyOnly", false), tab: store.get("tab", "caps"), open: null
+  };
+
+  // ---- theme
+  const theme = store.get("theme", "");
+  if (theme) document.documentElement.setAttribute("data-theme", theme);
+  $("theme").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme") ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next); store.set("theme", next);
+  });
+
+  function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800); }
+
+  // ---- data loading: embedded export first, then the PIE API
+  async function load(){
+    if (Array.isArray(window.__PIE_USAGE__)){
+      window.__PIE_USAGE__.forEach(c => { state.catalogs[c.module] = c; });
+      state.modules = window.__PIE_USAGE__.map(c => ({module:c.module, moduleName:c.moduleName}));
+    } else {
+      if (!API) throw new Error("No backend address is configured. Set apiBase in frontend/config.js (for example http://localhost:8000/usage/).");
+      const r = await fetch(API + "api/modules");
+      if (!r.ok) throw new Error("Could not load modules ("+r.status+")");
+      state.modules = await r.json();
+    }
+    if (!state.modules.length){ showEmpty("No usage catalog has been built yet. Run: python -m pie_agent.cli usage-build --module inventory"); return; }
+    const params = new URLSearchParams(location.search);
+    // Shareable deep links: ?modules=ess,inventory&tab=features&capability=...&q=...&feature=SCREEN_ID
+    const legacy = store.get("module", "");
+    const wanted = PieModules.fromUrl() || store.get("modules", legacy ? [legacy] : []);
+    state.picker = PieModules.create($("modules"), {
+      title: "Catalog of", selected: wanted.filter(w => state.modules.some(m => m.module === w)),
+      options: state.modules.map(m => ({value: m.module, label: m.moduleName || m.module})),
+      onChange: sel => selectModules(sel).catch(err => showEmpty(err.message)),
+    });
+    if (params.get("tab")) state.tab = params.get("tab") === "features" ? "feats" : "caps";
+    if (params.has("capability")) state.capability = params.get("capability");
+    if (params.get("q")){ state.q = params.get("q"); $("q").value = state.q; }
+    await selectModules(state.picker.get());
+    if (params.get("feature")) openFeature(params.get("feature"));
+  }
+
+  function shareLink(f){
+    const u = new URL(PieModules.link(state.picker.get()));
+    u.searchParams.set("tab", "features"); u.searchParams.set("feature", f.screenId);
+    return u.toString().replace(/%2C/g, ",");
+  }
+
+  // One catalog, or several merged into one view (empty selection = every module).
+  function combine(list){
+    if (list.length === 1) return list[0];
+    const count = {};
+    list.forEach(c => c.capabilities.forEach(cp => { count[cp.name] = (count[cp.name] || 0) + 1; }));
+    const capName = (c, n) => count[n] > 1 ? `${n} (${c.moduleName || c.module})` : n;
+    const sum = k => list.reduce((n, c) => n + (c.statistics[k] || 0), 0);
+    return {
+      product: list[0].product, module: list.map(c => c.module).join(","), moduleName: list.map(c => c.moduleName || c.module).join(" + "),
+      generatedAt: list.map(c => c.generatedAt).sort().pop(), multi: true,
+      capabilities: list.flatMap(c => c.capabilities.map(cp => ({...cp, name: capName(c, cp.name), module: c.module}))),
+      features: list.flatMap(c => c.features.map(f => ({...f, moduleName: c.moduleName || c.module, capability: {...f.capability, name: capName(c, f.capability.name)}}))),
+      statistics: {features: sum("features"), capabilities: sum("capabilities"), ready: sum("ready"), verifiedClaims: sum("verifiedClaims"),
+                   reviewClaims: sum("reviewClaims"), aiDraftsToReview: sum("aiDraftsToReview")},
+    };
+  }
+
+  async function selectModules(selected){
+    const mods = selected.length ? selected : state.modules.map(m => m.module);
+    for (const m of mods){
+      if (!state.catalogs[m]){
+        const r = await fetch(API + "api/catalog/" + encodeURIComponent(m));
+        if (!r.ok) throw new Error("Could not load the " + m + " catalog (" + r.status + ")");
+        state.catalogs[m] = await r.json();
+      }
+    }
+    state.selected = selected; store.set("modules", selected);
+    const c = state.merged = combine(mods.map(m => state.catalogs[m]));
+    if (state.capability && !c.capabilities.some(x => x.name === state.capability)) state.capability = "";
+    $("subtitle").textContent = `${c.product} · ${c.moduleName} · generated ${new Date(c.generatedAt).toLocaleDateString()}`;
+    render();
+  }
+
+  function showEmpty(msg){ $("stats").innerHTML = ""; $("caps").innerHTML = `<div class="empty">${esc(msg)}</div>`; $("grid").innerHTML = ""; }
+
+  const cat = () => state.merged;
+
+  function matches(f){
+    if (state.capability && f.capability.name !== state.capability) return false;
+    if (state.category && f.category !== state.category) return false;
+    if (state.readiness && f.readiness !== state.readiness) return false;
+    if (state.readyOnly && f.readiness !== "READY") return false;
+    if (state.q){
+      const hay = [f.name, f.capability.name, f.category, f.group, f.summary && f.summary.text, ...f.claims.map(c => c.text)].join(" ").toLowerCase();
+      if (!state.q.toLowerCase().split(/\s+/).every(w => hay.includes(w))) return false;
+    }
+    return true;
+  }
+
+  // ---- render
+  function render(){
+    const c = cat(); if (!c) return;
+    const s = c.statistics;
+    const pct = s.features ? Math.round(100 * s.ready / s.features) : 0;
+    $("stats").innerHTML = [
+      [s.features, "Features"], [s.capabilities, "Capabilities"],
+      [s.ready, `Marketing-ready (${pct}%)`], [s.verifiedClaims, "Verified highlights"],
+      [s.reviewClaims + (s.aiDraftsToReview || 0), `Items needing review (incl. ${s.aiDraftsToReview || 0} AI drafts)`]
+    ].map(([v,l]) => `<div class="stat"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
+    setTab(state.tab, true);
+    renderCaps(); renderFilters(); renderGrid();
+  }
+
+  function renderCaps(){
+    const c = cat();
+    $("caps").innerHTML = c.capabilities.map(cp => {
+      const feats = c.features.filter(f => f.capability.name === cp.name);
+      const w = n => cp.features ? (100 * n / cp.features).toFixed(1) + "%" : "0";
+      const candidate = cp.needsReview ? `<span class="chip" title="Grouping comes from a keyword taxonomy; confirm in capability_map.json">Candidate grouping</span>` : `<span class="chip">Confirmed grouping</span>`;
+      const top = feats.filter(f => f.readiness === "READY").slice(0, 5).map(f => esc(f.name));
+      return `<div class="cap">
+        <div class="meta">${candidate}${Object.entries(cp.categories).map(([k,v]) => `<span class="chip">${esc(k)} ${v}</span>`).join("")}</div>
+        <h4>${esc(cp.name)}</h4>
+        <div><b>${cp.features}</b> features · <b>${cp.verifiedClaims}</b> verified highlights</div>
+        <div class="bar" role="img" aria-label="${cp.ready} ready, ${cp.partial} partial, ${cp.needsEvidence} needing evidence">
+          <i class="r" style="width:${w(cp.ready)}"></i><i class="p" style="width:${w(cp.partial)}"></i><i class="e" style="width:${w(cp.needsEvidence)}"></i></div>
+        <div class="legend"><span class="r">${cp.ready} ready</span><span class="p">${cp.partial} partial</span><span class="e">${cp.needsEvidence} need evidence</span></div>
+        ${top.length ? `<div class="feat-list">Ready to feature: ${top.join(", ")}${cp.ready > 5 ? "…" : ""}</div>` : ""}
+        <div><button class="btn small" type="button" data-cap="${esc(cp.name)}">Browse features</button></div>
+      </div>`;
+    }).join("");
+  }
+
+  function opt(group, value, label, n){
+    const active = state[group] === value;
+    return `<button class="fopt" type="button" aria-pressed="${active}" data-group="${group}" data-value="${esc(value)}"><span>${esc(label)}</span><span class="n">${n}</span></button>`;
+  }
+
+  function renderFilters(){
+    const c = cat(); const all = c.features;
+    const count = (key, v) => all.filter(f => (key === "capability" ? f.capability.name : f[key]) === v).length;
+    const cats = [...new Set(all.map(f => f.category))].sort();
+    $("filters").innerHTML =
+      `<div class="fgroup"><h3>Capability</h3>${opt("capability","", "All capabilities", all.length)}${c.capabilities.map(cp => opt("capability", cp.name, cp.name, cp.features)).join("")}</div>
+       <div class="fgroup"><h3>Readiness</h3>${opt("readiness","", "Any", all.length)}${Object.keys(READINESS).map(k => opt("readiness", k, READINESS[k], count("readiness", k))).join("")}</div>
+       <div class="fgroup"><h3>Screen type</h3>${opt("category","", "All types", all.length)}${cats.map(k => opt("category", k, k, count("category", k))).join("")}</div>`;
+  }
+
+  function renderGrid(){
+    const list = cat().features.filter(matches);
+    if (state.q){
+      // Rank by where the query hits: exact name, then name, then everything else.
+      const q = state.q.toLowerCase();
+      const rank = f => { const n = f.name.toLowerCase(); return n === q ? 0 : n.includes(q) ? 1 : q.split(/\s+/).every(w => n.includes(w)) ? 2 : 3; };
+      list.sort((a, b) => rank(a) - rank(b));
+    }
+    $("count").textContent = `${list.length} feature${list.length === 1 ? "" : "s"}`;
+    if (!list.length){ $("grid").innerHTML = `<div class="empty">No features match these filters.</div>`; return; }
+    $("grid").innerHTML = list.map(f => {
+      const verified = f.claims.filter(x => x.status === "VERIFIED").slice(0, 3);
+      return `<button class="card" type="button" data-id="${esc(f.screenId)}">
+        <div class="meta"><span class="badge ${f.readiness}" title="${esc(READINESS_HELP[f.readiness])}">${esc(READINESS[f.readiness])}</span><span class="chip">${esc(f.category)}</span>${cat().multi ? `<span class="chip">${esc(f.moduleName)}</span>` : ""}</div>
+        <h4>${esc(f.name)}</h4>
+        <div class="chip" style="align-self:flex-start">${esc(f.capability.name)}</div>
+        ${f.summary ? `<div class="desc">${esc(f.summary.text)}</div>` : ""}
+        ${verified.length ? `<ul class="claims">${verified.map(x => `<li><span class="mark VERIFIED" aria-label="Verified">✓</span><span>${esc(x.text)}</span></li>`).join("")}</ul>` : `<div class="desc">No verified highlights yet.</div>`}
+        <div class="foot">${f.verifiedClaims} verified · ${f.reviewClaims} to review${f.migrationGaps.length ? " · backend check pending" : ""}</div>
+      </button>`;
+    }).join("");
+  }
+
+  // ---- detail drawer
+  function openFeature(id){
+    const f = cat().features.find(x => x.screenId === id); if (!f) return;
+    state.open = f;
+    $("d-title").textContent = f.name;
+    $("d-meta").innerHTML = `<span class="badge ${f.readiness}">${esc(READINESS[f.readiness])}</span><span class="chip">${esc(f.capability.name)}${f.capability.needsReview ? " (candidate)" : ""}</span><span class="chip">${esc(f.category)}</span>${f.group ? `<span class="chip">${esc(f.group)}</span>` : ""}`;
+    const claimHtml = x => `<div class="claim-row"><div class="t"><span class="mark ${x.status}" aria-label="${x.status === "VERIFIED" ? "Verified" : "Needs review"}">${x.status === "VERIFIED" ? "✓" : "!"}</span><span>${esc(x.text)}</span></div>
+      ${x.evidence && x.evidence.length ? `<ul class="ev">${x.evidence.map(e => `<li>${esc(e.detail)} — <code>${esc(e.source)}</code></li>`).join("")}</ul>` : ""}</div>`;
+    const verified = f.claims.filter(x => x.status === "VERIFIED"), review = f.claims.filter(x => x.status !== "VERIFIED");
+    const t = f.technical;
+    $("d-body").innerHTML = `
+      <div class="note info">${esc(READINESS_HELP[f.readiness])}</div>
+      ${f.migrationGaps.length ? `<div class="note warn">Some actions on this screen still point to legacy services that were not found in the current backend (${f.migrationGaps.map(g => esc(g.kind)).join(", ")}). Check with product before promoting them.</div>` : ""}
+      ${f.summary ? `<section class="block"><h3>Description <span class="mark REVIEW" aria-hidden="true">!</span> AI draft</h3><p style="margin:0">${esc(f.summary.text)}</p></section>` : ""}
+      <section class="block"><h3>Verified highlights (${verified.length})</h3>${verified.length ? verified.map(claimHtml).join("") : `<div class="desc" style="color:var(--muted)">None yet.</div>`}</section>
+      ${review.length ? `<section class="block"><h3>Needs review (${review.length})</h3>${review.map(claimHtml).join("")}</section>` : ""}
+      <section class="block"><details class="tech"><summary>Technical details</summary>
+        <div class="tech" style="margin-top:8px;font-size:12px;color:var(--muted)">
+          ${t.componentPath ? `<div>Screen: <code>${esc(t.componentPath)}</code></div>` : ""}
+          ${t.formDefinitionPath ? `<div>Form: <code>${esc(t.formDefinitionPath)}</code> (${t.fieldCount} fields)</div>` : ""}
+          <div>Screen ID: <code>${esc(f.screenId)}</code>${f.aliasScreenIds.length ? ` · aliases: <code>${esc(f.aliasScreenIds.join(", "))}</code>` : ""}</div>
+        </div>
+        ${t.apis.length ? `<table><thead><tr><th>Service</th><th>Confidence</th></tr></thead><tbody>${t.apis.map(a => `<tr><td><code>${esc(a.method)} ${esc(a.route)}</code></td><td>${esc(a.confidenceLevel)} (${esc(a.confidence)})</td></tr>`).join("")}</tbody></table>` : ""}
+        ${t.tables.length ? `<table><thead><tr><th>Table</th><th>Confidence</th></tr></thead><tbody>${t.tables.map(x => `<tr><td><code>${esc(x.schema)}.${esc(x.name)}</code>${x.shared ? " <span class='chip'>platform</span>" : ""}</td><td>${esc(x.confidence)}</td></tr>`).join("")}</tbody></table>` : ""}
+      </details></section>`;
+    $("d-include-ai").checked = false;
+    $("drawer").classList.add("open"); $("drawer-bg").classList.add("open");
+    $("d-close").focus();
+  }
+  function closeFeature(){ $("drawer").classList.remove("open"); $("drawer-bg").classList.remove("open"); state.open = null; }
+
+  function blurb(f, includeAi){
+    const lines = [`${f.name} (${cat().product} ${f.moduleName || cat().moduleName} · ${f.capability.name})`];
+    if (includeAi && f.summary) lines.push("", f.summary.text + "  [AI draft: review before publishing]");
+    const v = f.claims.filter(x => x.status === "VERIFIED");
+    if (v.length){ lines.push(""); v.forEach(x => lines.push("• " + x.text)); }
+    return lines.join("\n");
+  }
+  async function copy(text){
+    try{ await navigator.clipboard.writeText(text); toast("Copied to clipboard"); }
+    catch(e){ const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); toast("Copied to clipboard"); }catch(_){ toast("Copy failed"); } ta.remove(); }
+  }
+
+  function csv(){
+    const rows = [["Capability","Feature","Screen type","Readiness","Verified highlights","Needs review","Screen ID"]];
+    cat().features.filter(matches).forEach(f => rows.push([
+      f.capability.name, f.name, f.category, READINESS[f.readiness],
+      f.claims.filter(x => x.status === "VERIFIED").map(x => x.text).join(" | "),
+      f.claims.filter(x => x.status !== "VERIFIED").map(x => x.text).join(" | "), f.screenId]));
+    const body = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿" + body], {type:"text/csv"}));
+    a.download = `${cat().module.replace(/,/g, "-")}-feature-sheet.csv`; a.click(); URL.revokeObjectURL(a.href);
+  }
+
+  function setTab(tab, silent){
+    state.tab = tab; store.set("tab", tab);
+    $("tab-caps").setAttribute("aria-selected", tab === "caps"); $("tab-feats").setAttribute("aria-selected", tab === "feats");
+    $("view-caps").hidden = tab !== "caps"; $("view-feats").hidden = tab !== "feats";
+    if (!silent) window.scrollTo({top:0});
+  }
+
+  // ---- events
+  let qt; $("q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(() => { state.q = e.target.value.trim(); if (state.q && state.tab !== "feats") setTab("feats"); renderGrid(); }, 120); });
+  $("tab-caps").addEventListener("click", () => setTab("caps"));
+  $("tab-feats").addEventListener("click", () => setTab("feats"));
+  $("ready-only").checked = state.readyOnly;
+  $("ready-only").addEventListener("change", e => { state.readyOnly = e.target.checked; store.set("readyOnly", state.readyOnly); renderGrid(); });
+  $("csv").addEventListener("click", csv);
+  $("filters-toggle").addEventListener("click", e => { const open = $("filters").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", open); });
+  $("filters").addEventListener("click", e => {
+    const b = e.target.closest(".fopt"); if (!b) return;
+    state[b.dataset.group] = b.dataset.value;
+    if (b.dataset.group === "capability") store.set("capability", state.capability);
+    renderFilters(); renderGrid();
+  });
+  $("caps").addEventListener("click", e => {
+    const b = e.target.closest("[data-cap]"); if (!b) return;
+    state.capability = b.dataset.cap; store.set("capability", state.capability); setTab("feats"); renderFilters(); renderGrid();
+  });
+  $("grid").addEventListener("click", e => { const card = e.target.closest(".card"); if (card) openFeature(card.dataset.id); });
+  $("d-close").addEventListener("click", closeFeature);
+  $("drawer-bg").addEventListener("click", closeFeature);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && state.open) closeFeature(); });
+  $("d-copy").addEventListener("click", () => state.open && copy(blurb(state.open, $("d-include-ai").checked)));
+  $("d-link").addEventListener("click", () => state.open && copy(shareLink(state.open)));
+
+  load().catch(err => showEmpty(err.message));
+})();
+</script>
+</body>
+</html>

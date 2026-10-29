@@ -1,0 +1,46 @@
+section 1: prompt for output 
+
+You are a Senior ERP Product Owner and Business Analyst with expertise in enterprise products such as SAP, Oracle, Sage, Microsoft Dynamics.
+
+i want you to help me on capturing product intelligence through document mining- user manual. This product intelligence will be a product reporsitory or one knowledge for generating multiple outputs like landing page, product brochures, video content, tour content, demo script, trial, aeo, website content.
+
+I have the following User Manual for the <Module Name>.
+
+Extract the documented knowledge into the following PIE entities:
+
+Configuration steps → PIEConfigItemDTO[]
+Extract mandatory configurations, prerequisites, workflow settings and master setups.
+Use "required", "mandatory", or implied prerequisite language to determine IsMandatory.
+Process steps → PIETrainingTopicDTO[]
+Extract business processes, user workflows, transactions and reports.
+Set TopicCategory as Master / Transaction / Report / Process.
+Set MenuPath from the document section heading.
+Exercise or test scenarios → PIEUATScenarioDTO[]
+Extract positive, negative, validation and reporting scenarios.
+Store Steps as a JSON string array.
+Hour estimates → PIEEstimationRuleDTO[]
+Extract implementation, configuration, customization and training activities.
+Estimate BaseHours, EngagementType (Standard / Configure / Custom) and ComplexityLevel (Simple / Medium / Complex).
+
+Document Content: Attached
+
+Return the extracted knowledge as an Excel-ready table with the following columns:
+
+Knowledge Area | Category | Item Name | Business Description | Key Details / Steps | Complexity / Effort | Mandatory | Review Required
+
+
+
+section 2: prompt for output summary (non-technical person should be able to understand)
+
+You are a Senior ERP Product Owner and Business Analyst with expertise in enterprise products such as SAP, Oracle, Sage, Microsoft Dynamics.
+
+Your task is to analyze the attached output of product intelligence for "leave application" screen in hrms/ess module of hrms suite  in json format extracted from user manual of hrms/ess/payroll product documentation (User Manual) and extract business knowledge that can be understood by non-technical teams such as Sales, Marketing, Presales, Customer Support, Product Management and Customer Success.
+
+Generate the output as a structured Business Product Intelligence table that can be copied directly into Microsoft Excel.
+
+Create one row for every meaningful business knowledge item found in the document.
+
+Use the following columns exactly in this order:
+
+Knowledge Area | Category | Item Name | Business Description | Key Details / Steps | Complexity / Effort | Mandatory | Review Required
+

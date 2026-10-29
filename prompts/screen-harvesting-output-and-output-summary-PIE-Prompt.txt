@@ -1,0 +1,64 @@
+You act as a product owner/subject matter expert for saas product. you have worked on fortune product like sap, oracle and sage. 
+
+i want you to help me on capturing product intelligence through product screenshot. This product intelligence will be a product reporsitory or one knowledge for generating multiple outputs like landing page, product brochures, video content, tour content, demo script, trial, aeo, website content.
+
+
+section 1- prompt for output
+
+Analyse the attached screenshot of the [MODULE_NAME] configuration screen.
+
+Extract the complete PIE Product Knowledge represented by the screen—not only the visible controls, but also the business configuration, rules, validations, workflow behaviour and master data that the screen is intended to configure.
+
+Identify every relevant: Field, Toggle, Dropdown, Checkbox, Radio button, Lookup value, Grid column, Business rule, Validation rule, Workflow option, Master configuration, Behavioural option, Default setting, Implied configuration represented by the screen
+
+For each item determine:
+
+Type: ConfigItem (one-time configuration/master/prerequisite) or Variant (behaviour, selectable option, business rule or processing option)
+ItemCategory: BizTransaction / Workflow / Role / DocumentFormat / MailScheduler / Infrastructure
+IsMandatory: 0 or 1 (Can the customer successfully go live without configuring this?)
+EstimatedHours: 0.25 / 0.5 / 1 / 2 / 4
+
+Extraction Guidelines:
+Think like an ERP Product Owner.
+Capture the complete business knowledge represented by the screen.
+Infer related ConfigItems and Variants that are clearly implied by the business context, even if they are not explicitly visible.
+Consider business rules, validations, approval workflows, master data, calculation rules, eligibility rules, date rules, document requirements, permissions, and processing options whenever they are implied by the screen.
+Group related fields into a single ConfigItem with associated Variants.
+Do not extract generic UI buttons (Save, Cancel, Search, Refresh, Close) unless they represent configurable business behaviour.
+If an inferred item cannot be confirmed from the screenshot, include it with "needsReview": true.
+
+Output:
+
+{
+  "configItems": [...PIEConfigItemDTO fields...],
+  "variants": [...PIEVariantDTO fields...]
+}
+
+Screenshot: Attached.
+
+Section 2- prompt for output summary (for non technical people to understand)
+
+I have taken a product screenshot and generated a output in json format for product intelligence for "leave application" screen in hrms/ess module of hrms suite.
+
+Output the analysis as a Business Product Intelligence Excel Table suitable for Sales, Marketing, Customer Support, Presales, and Product Teams.
+
+Generate one row for every configurable field, option, business rule, workflow setting, dashboard element, or user action visible on the screen.
+
+Include the following columns:
+
+Section
+Screen Area
+Field / Configuration
+UI Type
+Purpose
+Business Description
+Available Options
+Mandatory (Yes/No)
+Default Value
+Implementation Effort (Hours)
+Business Impact
+Used By
+
+Use simple business language instead of technical terms such as ConfigItem, Variant, DTO, or EstimatedHours.
+
+The output should be directly pasteable into Microsoft Excel and understandable by non-technical users such as Sales, Marketing, Customer Support, Presales, Product Marketing, and Management.

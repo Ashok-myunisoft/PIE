@@ -1,0 +1,17 @@
+pydantic>=2.8
+openpyxl>=3.1
+pypdf>=5.0
+PyMuPDF>=1.24
+beautifulsoup4>=4.12
+fastapi>=0.115
+uvicorn>=0.30
+python-multipart>=0.0.9
+python-dotenv>=1.0
+openai>=1.40
+
+SQLAlchemy>=2.0
+pyodbc>=5.1
+
+pytest
+
+# v0.18 Qdrant KMS uses Qdrant HTTP API; no paid embedding API required.

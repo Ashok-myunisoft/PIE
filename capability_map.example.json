@@ -1,0 +1,6 @@
+{
+  "LEAVE_LEAVE_APPLICATION": {
+    "capability": "Leave Management",
+    "basis": "human_confirmed"
+  }
+}

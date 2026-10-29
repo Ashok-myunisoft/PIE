@@ -1,0 +1,335 @@
+{
+  "ModuleCode": "HR_LEAVE_REQUEST",
+  "ModuleName": "Leave Request",
+  "ModuleType": "Transaction",
+  "FunctionalArea": "Human Resource Management",
+  "SubModule": "Leave Management",
+  "Description": "Employee leave application screen used to apply leave requests, validate leave availability, capture leave details and process approval workflow."
+}
+[
+{
+"ItemCode":"LEAVE_CFG_001",
+"ItemName":"Leave Type Configuration",
+"ItemCategory":"BizTransaction",
+"Description":"Defines different leave categories such as Casual Leave, Sick Leave, Annual Leave and LOP.",
+"IsMandatory":1,
+"DefaultValue":"Casual Leave",
+"EstimatedHours":8
+},
+{
+"ItemCode":"LEAVE_CFG_002",
+"ItemName":"Leave Balance Maintenance",
+"ItemCategory":"BizTransaction",
+"Description":"Controls whether available leave balance should be maintained for the leave type.",
+"IsMandatory":1,
+"DefaultValue":"Enabled",
+"EstimatedHours":4
+},
+{
+"ItemCode":"LEAVE_CFG_003",
+"ItemName":"Leave Carry Forward",
+"ItemCategory":"BizTransaction",
+"Description":"Controls whether unused leave balance can be carried forward to next period.",
+"IsMandatory":0,
+"DefaultValue":"Disabled",
+"EstimatedHours":6
+},
+{
+"ItemCode":"LEAVE_CFG_004",
+"ItemName":"Leave Encashment",
+"ItemCategory":"BizTransaction",
+"Description":"Defines whether unused leave can be converted into monetary benefit.",
+"IsMandatory":0,
+"DefaultValue":"Disabled",
+"EstimatedHours":6
+},
+{
+"ItemCode":"LEAVE_CFG_005",
+"ItemName":"Leave Credit Method",
+"ItemCategory":"BizTransaction",
+"Description":"Defines how leave balance is credited to employees.",
+"IsMandatory":1,
+"DefaultValue":"Fixed",
+"EstimatedHours":8
+},
+{
+"ItemCode":"LEAVE_CFG_006",
+"ItemName":"Leave Approval Workflow",
+"ItemCategory":"Workflow",
+"Description":"Controls approval process for submitted leave requests.",
+"IsMandatory":1,
+"DefaultValue":"Configured Workflow",
+"EstimatedHours":12
+},
+{
+"ItemCode":"LEAVE_CFG_007",
+"ItemName":"Reason Master Configuration",
+"ItemCategory":"BizTransaction",
+"Description":"Defines selectable reasons while applying leave.",
+"IsMandatory":1,
+"DefaultValue":"Reason Master",
+"EstimatedHours":4
+},
+{
+"ItemCode":"LEAVE_CFG_008",
+"ItemName":"Holiday Inclusion Rule",
+"ItemCategory":"BizTransaction",
+"Description":"Controls whether holidays/weekoffs are considered during leave calculation.",
+"IsMandatory":0,
+"DefaultValue":"Exclude Holiday",
+"EstimatedHours":6
+},
+{
+"ItemCode":"LEAVE_CFG_009",
+"ItemName":"Leave Day Calculation",
+"ItemCategory":"BizTransaction",
+"Description":"Determines Full Day, Half Day or partial leave calculation.",
+"IsMandatory":1,
+"DefaultValue":"Full Day",
+"EstimatedHours":5
+},
+{
+"ItemCode":"LEAVE_CFG_010",
+"ItemName":"Leave Tracking Requirement",
+"ItemCategory":"Infrastructure",
+"Description":"Enables audit and tracking of leave transactions.",
+"IsMandatory":0,
+"DefaultValue":"Enabled",
+"EstimatedHours":5
+}
+]
+[
+{
+"VariantCode":"LV_VARIANT_TYPE",
+"VariantName":"Leave Type",
+"Description":"Different categories of employee leave.",
+"PlainLanguageDesc":"Determines what kind of leave employee is applying.",
+"IsDefault":0,
+"Implications":[
+{
+"ImplicationType":2,
+"EffortDeltaHours":4,
+"Description":"Requires leave policy configuration.",
+"RiskNote":"Incorrect setup impacts leave balance."
+}
+]
+},
+
+{
+"VariantCode":"LV_VARIANT_DAYTYPE",
+"VariantName":"Leave Day Type",
+"Description":"Defines duration type of leave.",
+"PlainLanguageDesc":"Allows employee to select Full Day or partial leave.",
+"IsDefault":1,
+"Implications":[
+{
+"ImplicationType":3,
+"EffortDeltaHours":2,
+"Description":"Users need awareness on leave duration selection.",
+"RiskNote":"Wrong selection impacts attendance."
+}
+]
+},
+
+{
+"VariantCode":"LV_VARIANT_CREDITMETHOD",
+"VariantName":"Leave Credit Method",
+"Description":"Defines calculation method for leave credit.",
+"PlainLanguageDesc":"Controls how employees receive leave balance.",
+"IsDefault":1,
+"Implications":[
+{
+"ImplicationType":2,
+"EffortDeltaHours":8,
+"Description":"Requires HR policy configuration.",
+"RiskNote":"Incorrect formula affects entitlement."
+}
+]
+},
+
+{
+"VariantCode":"LV_VARIANT_LEAVETYPE",
+"VariantName":"Leave Classification",
+"Description":"Business classification of leave.",
+"PlainLanguageDesc":"Defines whether leave is paid, unpaid, holiday etc.",
+"IsDefault":0,
+"Implications":[
+{
+"ImplicationType":6,
+"EffortDeltaHours":5,
+"Description":"May impact payroll calculation.",
+"RiskNote":"LOP configuration affects salary."
+}
+]
+}
+]
+[
+{
+"FieldName":"EmployeeName",
+"ControlType":"Picklist",
+"DatabaseField":"EmployeeId",
+"Purpose":"Identifies employee applying leave",
+"Mandatory":true
+},
+
+{
+"FieldName":"Leave Type",
+"ControlType":"Picklist",
+"DatabaseField":"LEAVETYPEID",
+"Purpose":"Select leave category",
+"Mandatory":true
+},
+
+{
+"FieldName":"Leave Date",
+"ControlType":"Date",
+"DatabaseField":"LEAVEDATE",
+"Purpose":"Request creation date",
+"Mandatory":true
+},
+
+{
+"FieldName":"Reference Number",
+"ControlType":"Input",
+"DatabaseField":"REFERENCENUMBER",
+"Purpose":"External reference tracking",
+"Mandatory":false
+},
+
+{
+"FieldName":"Reference Date",
+"ControlType":"Date",
+"DatabaseField":"REFERENCEDATE",
+"Purpose":"Reference document date",
+"Mandatory":false
+},
+
+{
+"FieldName":"Remarks",
+"ControlType":"Textarea",
+"DatabaseField":"REMARKS",
+"Purpose":"Additional employee comments",
+"Mandatory":false
+},
+
+{
+"FieldName":"Number Of Days",
+"ControlType":"Input",
+"DatabaseField":"NUMBEROFDAYS",
+"Purpose":"Total leave duration",
+"Mandatory":true
+},
+
+{
+"FieldName":"Reason",
+"ControlType":"Picklist",
+"DatabaseField":"REASONID",
+"Purpose":"Leave reason selection",
+"Mandatory":true
+}
+]
+{
+"EmployeeId":"-1399999762",
+"EmployeeName":"Thilakeshwaran R",
+"LeaveType":"Casual Leave",
+"AvailableBalance":"4",
+"LeaveDays":1,
+"LeaveDayType":"FullDay",
+"ReasonId":"-1499999996",
+"Status":"Active"
+}
+{
+  "ModuleCode": "HR_LEAVE_REQUEST",
+  "ModuleName": "Leave Request",
+  "FunctionalArea": "HRMS",
+  "TransactionType": "Employee Self Service Transaction",
+  "Purpose": "Apply, validate, approve and track employee leave requests",
+  "SourceFiles": [
+    "Angular HTML",
+    "Angular TS",
+    "BLL",
+    "DAL",
+    "Query",
+    "Database Schema",
+    "Service Response"
+  ]
+}
+{
+"ItemCode":"MLEAVE_ISENCASHABLE",
+"ItemName":"Leave Encashment Availability",
+"ItemCategory":"BizTransaction",
+"Description":"Controls whether unused leave balance can be converted into monetary benefit.",
+"IsMandatory":1,
+"DefaultValue":"0 - No",
+"EstimatedHours":4,
+"Source":"MLEAVE.ISENCASHABLE"
+}
+{
+"VariantCode":"LEAVE_CREDIT_METHOD",
+"VariantName":"Workdays Based",
+"Description":"Leave credit is calculated based on employee worked days.",
+"PlainLanguageDesc":"Useful for factories where leave entitlement depends on attendance.",
+"IsDefault":0,
+"Implications":[
+{
+"ImplicationType":2,
+"EffortDeltaHours":8,
+"Description":"Requires attendance integration.",
+"RiskNote":"Incorrect attendance data affects leave balance."
+}
+]
+}
+{
+"TableName":"MLEAVE",
+"TableType":"Master",
+"BusinessPurpose":"Stores leave policy definitions.",
+"PrimaryKey":"LEAVEID",
+"ImportantFields":[
+{
+"Field":"LEAVENAME",
+"Meaning":"Leave category name"
+},
+{
+"Field":"CREDITMETHOD",
+"Meaning":"Leave accrual calculation method"
+}
+]
+}
+{
+"TableName":"TLEAVE",
+"TableType":"Transaction",
+"BusinessPurpose":"Stores employee leave requests.",
+"PrimaryKey":"LEAVEID",
+"WorkflowEnabled":true
+}
+{
+"Component":"gb-newpicklist",
+"Field":"EmployeeName",
+"Purpose":"Employee selection",
+"Events":[
+"PicklistValue",
+"EmployeeNamFunction"
+],
+"DatabaseMapping":"EmployeeId"
+}
+[
+{
+"RuleCode":"LEAVE_RULE_001",
+"RuleName":"Leave Balance Validation",
+"When":"Employee applies leave",
+"Condition":"Requested days <= Available Leave",
+"Action":"Allow submission",
+"Failure":"Prevent submission"
+}
+]
+{
+"WorkflowName":"Leave Approval Workflow",
+"Entity":"Leave",
+"Steps":[
+"Submit",
+"Approval",
+"Reject",
+"Complete"
+],
+"TrackingEnabled":true
+}

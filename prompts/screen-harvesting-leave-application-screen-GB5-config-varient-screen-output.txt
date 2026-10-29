@@ -1,0 +1,345 @@
+{
+  "configItems": [
+    {
+      "ConfigItemCode": "LV-LEAVE-TYPE",
+      "ItemName": "Leave Type Master",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "DefaultValue": null,
+      "EstimatedHours": 2,
+      "Description": "Defines all leave categories available for employees (Casual Leave, Sick Leave, Earned Leave, Maternity Leave, Compensatory Leave, Extra Hours Leave, Loss of Pay, Absent, On Duty etc.)."
+    },
+    {
+      "ConfigItemCode": "LV-LEAVE-REASON",
+      "ItemName": "Leave Reason Master",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "DefaultValue": null,
+      "EstimatedHours": 0.5,
+      "Description": "Defines selectable leave reasons such as Personal, Health Issue, Emergency."
+    },
+
+    {
+      "ConfigItemCode": "LV-SESSION-CONFIG",
+      "ItemName": "Leave Session Definition",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "DefaultValue": "First Half, Second Half",
+      "EstimatedHours": 1,
+      "Description": "Defines leave sessions available for each leave day."
+    },
+   {
+      "ConfigItemCode": "LV-DOCUMENT-TYPE",
+      "ItemName": "Leave Document Type Master",
+      "ItemCategory": "DocumentFormat",
+      "IsMandatory": 0,
+      "DefaultValue": null,
+      "EstimatedHours": 0.5,
+      "Description": "Defines document types that may be attached to leave requests."
+    },
+    {
+      "ConfigItemCode": "LV-DOCUMENT-CLASS",
+      "ItemName": "Document Classification",
+      "ItemCategory": "DocumentFormat",
+      "IsMandatory": 0,
+      "DefaultValue": null,
+      "EstimatedHours": 0.5,
+      "Description": "Defines document classifications for leave attachments."
+    },
+
+
+    {
+      "ConfigItemCode": "LV-CONF-007",
+      "ItemName": "Leave Calendar Rule",
+      "Type": "ConfigItem",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "EstimatedHours": 2,
+      "Description": "Controls exclusion of weekly offs and holidays while computing leave duration."
+    },
+{
+      "ConfigItemCode": "LV-MULTIDAY-SESSION",
+      "ItemName": "Leave Session Selection Rule",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "DefaultValue": "Each Leave Date",
+      "EstimatedHours": 1,
+      "Description": "Determines whether leave session selection is maintained individually for every leave date or applied to the entire leave request."
+    },
+    {
+      "ConfigItemCode": "LV-BALANCE-VALIDATION",
+      "ItemName": "Leave Balance Validation Rule",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "DefaultValue": "Validate Before Save",
+      "EstimatedHours": 2,
+      "Description": "Determines whether available leave balance is validated before allowing leave submission."
+    }
+{
+      "ConfigItemCode": "LV-EDIT-WINDOW",
+      "ItemName": "Leave Request Edit Policy",
+      "ItemCategory": "Workflow",
+      "IsMandatory": 1,
+      "DefaultValue": "Allow Until Approval",
+      "EstimatedHours": 1,
+      "Description": "Determines whether submitted leave requests can be modified and until which workflow stage editing is permitted."
+    },
+    {
+      "ConfigItemCode": "LV-DELETE-WINDOW",
+      "ItemName": "Leave Request Deletion Policy",
+      "ItemCategory": "Workflow",
+      "IsMandatory": 1,
+      "DefaultValue": "Allow Before Approval",
+      "EstimatedHours": 1,
+      "Description": "Controls whether employees can delete submitted leave requests and defines the workflow stages where deletion is allowed."
+    },
+
+    {
+      "ConfigItemCode": "LV-APPROVAL-VIEW",
+      "ItemName": "Leave Approval Entity Viewer",
+      "ItemCategory": "Workflow",
+      "IsMandatory": 1,
+      "DefaultValue": "Enabled",
+      "EstimatedHours": 1,
+      "Description": "Configures the detailed leave request view available to approvers before taking an approval decision."
+    },
+{
+      "ConfigItemCode": "LV-LEAVE-HISTORY",
+      "ItemName": "Leave History Display Configuration",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 0,
+      "DefaultValue": "Recent Leave History",
+      "EstimatedHours": 0.5,
+      "Description": "Defines the leave history information displayed to employees including leave request details, status and remarks."
+    },
+    {
+      "ConfigItemCode": "LV-LEAVE-SUMMARY",
+      "ItemName": "Leave Summary Dashboard Configuration",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 0,
+      "DefaultValue": "Enabled",
+      "EstimatedHours": 1,
+      "Description": "Controls the leave balance summary dashboard displayed to employees, including opening balance, allotted leave, applied leave, pending approval, expired leave and current balance."
+    },
+
+    {
+      "ConfigItemCode": "LV-LEAVE-GRAPH",
+      "ItemName": "Leave Analytics Dashboard",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 0,
+      "DefaultValue": "Monthly Leave Summary",
+      "EstimatedHours": 1,
+      "Description": "Configures graphical visualization of employee leave utilization across the financial year."
+    },
+
+
+  "variants": [
+    {
+      "VariantCode": "LVTYPE",
+      "ConfigItemCode": "LV-LEAVE-TYPE",
+      "VariantName": "Leave Type",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.5,
+      "VariantValues": [
+        "Casual Leave",
+        "Sick Leave",
+        "Earned Leave",
+        "Maternity Leave",
+        "Compensatory Leave",
+        "Extra Hours Leave",
+        "Loss of Pay",
+        "Absent",
+        "On Duty"
+      ]
+    },
+    {
+      "VariantCode": "LVREASON",
+      "ConfigItemCode": "LV-LEAVE-REASON",
+      "VariantName": "Reason",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Personal",
+        "Health Issue",
+        "Emergency"
+      ]
+    },
+
+    {
+      "VariantCode": "DAYSESSION",
+      "ConfigItemCode": "LV-SESSION-CONFIG",
+      "VariantName": "Leave Session",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Full Day",
+        "First Half",
+        "Second Half"
+      ]
+    },
+    {
+      "VariantCode": "DOCTYPE",
+      "ConfigItemCode": "LV-DOCUMENT-TYPE",
+      "VariantName": "Document Type",
+      "ItemCategory": "DocumentFormat",
+      "IsMandatory": 0,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "None",
+        "Medical Certificate",
+        "Supporting Document"
+      ]
+    },
+    {
+      "VariantCode": "DOCCLASS",
+      "ConfigItemCode": "LV-DOCUMENT-CLASS",
+      "VariantName": "Document Classification",
+      "ItemCategory": "DocumentFormat",
+      "IsMandatory": 0,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "None",
+        "HR",
+        "Medical",
+        "Confidential"
+      ]
+    }
+    {
+      "VariantCode": "LV-CALENDAR-RULE",
+      "ConfigItemCode": "LV-CONF-007",
+      "VariantName": "Leave Calendar Rule",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.5,
+      "VariantValues": [
+        "Include Weekly Off",
+        "Exclude Weekly Off",
+        "Include Public Holiday",
+        "Exclude Public Holiday"
+      ]
+    }
+    {
+      "VariantCode": "LV-MULTIDAY-SESSION-RULE",
+      "ConfigItemCode": "LV-MULTIDAY-SESSION",
+      "VariantName": "Session Selection Scope",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Entire Leave Request",
+        "Each Leave Date"
+      ]
+    },
+    {
+      "VariantCode": "LV-BALANCE-VALIDATION",
+      "ConfigItemCode": "LV-BALANCE-VALIDATION",
+      "VariantName": "Balance Validation",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Validate Before Save",
+        "Validate During Approval",
+        "Warning Only",
+        "No Validation"
+      ]
+{
+      "VariantCode": "LV-EDIT-POLICY",
+      "ConfigItemCode": "LV-EDIT-WINDOW",
+      "VariantName": "Edit Permission Stage",
+      "ItemCategory": "Workflow",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Not Allowed",
+        "Before Submission",
+        "Until Approval",
+        "Until Final Approval",
+        "Always Allowed"
+      ]
+    },
+    {
+      "VariantCode": "LV-DELETE-POLICY",
+      "ConfigItemCode": "LV-DELETE-WINDOW",
+      "VariantName": "Delete Permission Stage",
+      "ItemCategory": "Workflow",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Not Allowed",
+        "Before Approval",
+        "Before Final Approval",
+        "After Rejection Only"
+      ]
+    },
+
+    {
+      "VariantCode": "LV-ENTITY-VIEW",
+      "ConfigItemCode": "LV-APPROVAL-VIEW",
+      "VariantName": "Entity Viewer Availability",
+      "ItemCategory": "Workflow",
+      "IsMandatory": 1,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Enabled",
+        "Disabled"
+      ]
+    },
+{
+      "VariantCode": "LV-HISTORY-COLUMNS",
+      "ConfigItemCode": "LV-LEAVE-HISTORY",
+      "VariantName": "Leave History Columns",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 0,
+      "EstimatedHours": 0.5,
+      "VariantValues": [
+        "Entry Date",
+        "Leave Request Number",
+        "Leave Type",
+        "Leave Date",
+        "Day Type",
+        "Status",
+        "Remarks"
+      ]
+    },
+
+  "variants": [
+    {
+      "VariantCode": "LV-SUMMARY-COLUMNS",
+      "ConfigItemCode": "LV-LEAVE-SUMMARY",
+      "VariantName": "Leave Summary Metrics",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 0,
+      "EstimatedHours": 0.5,
+      "VariantValues": [
+        "Opening",
+        "Allotted",
+        "Applied Leave",
+        "Approval Pending",
+        "Expired",
+        "Balance"
+      ]
+    },
+
+    {
+      "VariantCode": "LV-GRAPH-TYPE",
+      "ConfigItemCode": "LV-LEAVE-GRAPH",
+      "VariantName": "Leave Analytics View",
+      "ItemCategory": "BizTransaction",
+      "IsMandatory": 0,
+      "EstimatedHours": 0.25,
+      "VariantValues": [
+        "Monthly Graph",
+        "Yearly Graph"
+      ]
+    },
+
+  ]
+}
+
+
+
+

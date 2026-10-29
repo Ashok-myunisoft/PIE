@@ -1,0 +1,203 @@
+<form [formGroup]="form" *ngIf="form.bFormReady">
+    <gb-formaction [FormDetails]="form" [FormData]="form.value" [MenuRights]="MenuRights"
+        (FormOutput)="FormOutput($event)" [BizTransactionPicklistRequired]="BizTransactionTypeRequired"
+        [BizTransactionType]="BizType" [PrimaryId]="PrimaryId" [IsListButtonRequired]="IsListButtonRequired"
+        [SettingButtonRequired]="false" [DraftButtonRequired]="false"></gb-formaction>
+    <div class="FormOverView scrollbar">
+        <div class="FormSection" style="margin-bottom: 12px;">
+            <div class="leave-form-container">
+
+                <!-- Center Column -->
+
+                <div class="middle-column">
+                    <!-- Current Data Section -->
+                    <div
+                        style="background:var(--bg-surface);width: 930px;height: 91px;padding-top: 6px;padding-right: 12px;margin-bottom: 10px;gap: 2px;border-radius: 8px;">
+
+
+                        <div class="form-row card-boxed">
+                            <div *ngIf="TLeaveLeaveNumberRequired">
+                                <gb-newpicklist (PicklistValue)="OnPicklistChange($event)" [FormData]="form.value"
+                                    formControlName="TLeaveLeaveNumber"
+                                    (PicklistValue)="TLeaveRetrivalFunction($event)">
+                                </gb-newpicklist>
+                            </div>
+                            <div *ngIf="TLeaveLeaveNumberRequiredESS">
+                                <gb-newpicklist (PicklistValue)="OnPicklistChange($event)" [FormData]="form.value"
+                                    formControlName="TLeaveLeaveNumbeESS"
+                                    (PicklistValue)="TLeaveRetrivalFunction($event)">
+                                </gb-newpicklist>
+                            </div>
+
+                            <gb-date formControlName="TLeaveLeaveDate" [date]="form.get('TLeaveId')?.value"
+                                [default]="'todaygb5'" [DateRefresh]="dateact" [ReadOnly]="EntryDateRequired">
+                            </gb-date>
+
+                            <gb-input formControlName="TLeaveReferenceNumber" style="margin-left:10px;"></gb-input>
+
+                            <gb-date formControlName="TLeaveReferenceDate" [date]="form.get('TLeaveId')?.value"
+                                [default]="'todaygb5'" [DateRefresh]="dateact">
+                            </gb-date>
+
+                            <div *ngIf="LeaveSectionStatus" class="leave-status-wrapper"
+                                [ngClass]="leaveStatusColorClass">
+                                <gb-combobox formControlName="TLeaveStatus" [hideComboboxvalue]="true"
+                                    [gbReadOnly]="true">
+                                </gb-combobox>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <!-- ERP Employee Picklist -->
+                        <gb-newpicklist *ngIf="ErpEmployeePicklistRequired"
+                            (PicklistValue)="OnPicklistChanges($event); EmployeeNamFunction($event)"
+                            [FormData]="form.value" formControlName="ErpEmployeeName">
+                        </gb-newpicklist>
+
+                        <!-- ESS Functional Employee Picklist -->
+                        <gb-newpicklist *ngIf="EssFunctionalEmployeePicklistRequired"
+                            (PicklistValue)="OnPicklistChanges($event); EmployeeNamFunction($event)"
+                            [FormData]="form.value" formControlName="EssFunEmployeeName">
+                        </gb-newpicklist>
+
+                        <!-- ESS Self Employee Picklist (Read-only) -->
+                        <gb-newpicklist *ngIf="EssSelfEmployeePicklistRequired"
+                            (PicklistValue)="OnPicklistChanges($event); EmployeeNamFunction($event)"
+                            [FormData]="form.value" [gbReadOnly]="true" formControlName="EmployeeName">
+                        </gb-newpicklist>
+
+                        <!-- ESS Admin Employee Picklist -->
+                        <gb-newpicklist *ngIf="EssAdminEmployeePicklistRequired"
+                            (PicklistValue)="OnPicklistChanges($event); EmployeeNamFunction($event)"
+                            [FormData]="form.value" formControlName="EssAdminEmployeeName">
+                        </gb-newpicklist>
+
+                        <!-- ESS Site Employee Picklist -->
+                        <gb-newpicklist *ngIf="EssSiteEmployeePicklistRequired"
+                            (PicklistValue)="OnPicklistChanges($event); EmployeeNamFunction($event)"
+                            [FormData]="form.value" formControlName="EssSiteEmployeeName">
+                        </gb-newpicklist>
+
+                        <!-- Employee Code Display -->
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-top: -6px; color: var(--field-helper-default);">
+                            <p class="emp-code">{{ EmployeeCode }}</p>
+                        </div>
+                    </div>
+                    <!-- Leave Section -->
+                    <div
+                        style="background: var(--bg-surface); width: 760px; height: 164px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px;">
+
+
+                        <!-- First Row -->
+                        <div class="form-row card-box" style="display: flex;">
+
+                            <!-- Leave Type -->
+                            <div class="form-group">
+                                <div *ngIf="this.ModuleId === -1499999788">
+                                    <gb-newpicklist (PicklistValue)="OnPicklistChange($event)" [FormData]="form.value"
+                                        formControlName="LeaveTypeName" (PicklistValue)="LeaveTypeNameFunction($event)">
+                                    </gb-newpicklist>
+                                </div>
+                                <!-- ✅ FIXED: was *ngIf="this.ModuleId" which is always truthy -->
+                                <div *ngIf="this.ModuleId !== -1499999788">
+                                    <gb-newpicklist (PicklistValue)="OnPicklistChange($event)" [FormData]="form.value"
+                                        formControlName="LeaveTypeNameEss"
+                                        (PicklistValue)="LeaveTypeNameFunction($event)">
+                                    </gb-newpicklist>
+                                </div>
+                            </div>
+
+                            <!-- From Date -->
+                            <gb-date formControlName="TLeaveDetailLeaveDate" [date]="form.get('TLeaveId')?.value"
+                                [default]="'todaygb5'" [DateRefresh]="dateact"
+                                (DateOutPut)="TLeaveDetailLeaveDateGet($event)" [msDateFormat]="msDateFormat">
+                            </gb-date>
+
+                            <!-- To Date -->
+                            <gb-date formControlName="TLeaveDetailValidTill" [date]="form.get('TLeaveId')?.value"
+                                [default]="'todaygb5'" [DateRefresh]="dateact"
+                                (DateOutPut)="TLeaveDetailValidTillGet($event)" [msDateFormat]="msDateFormat"
+                                style="margin-left: 10px;">
+                            </gb-date>
+
+                            <!-- Days -->
+                            <gb-input formControlName="TLeaveNumberOfDays" [hideBorder]="true" style="margin-left: 10px;">
+                            </gb-input>
+
+                        </div>
+
+                        <!-- Second Row: LOP + Buttons UNDER From-To -->
+                        <div style="display: flex;margin-top: -75px;margin-bottom: 6px;">
+                            <p class="code-text" style="margin-top: 10px;margin-left: 16px;">{{LeaveTypeCode}}</p>
+
+                            <div style="margin-left: 354px;margin-top: 14px;">
+                                <button class="date1-btn" [ngClass]="{ active: activeDateType === 'yesterday' }"
+                                    type="button" (click)="selectDate('yesterday')" [disabled]="buttonreadonlyrequired">
+                                    Yesterday
+                                </button>
+
+                                <button class="date2-btn" [ngClass]="{ active: activeDateType === 'today' }"
+                                    type="button" (click)="selectDate('today')" [disabled]="buttonreadonlyrequired">
+                                    Today
+                                </button>
+
+                                <button class="date3-btn" [ngClass]="{ active: activeDateType === 'tomorrow' }"
+                                    type="button" (click)="selectDate('tomorrow')" [disabled]="buttonreadonlyrequired">
+                                    Tomorrow
+                                </button>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <div class="balance-box">
+                        <div class="balance-header">
+                            <span>Type</span>
+                            <span>Balance</span>
+                        </div>
+                        <div class="balance-row" *ngFor="let leave of Dailyreport; let i = index"
+                            style="background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); color: var(--text-primary);">
+                            <span>{{ leave.LeaveName }}</span>
+                            <span class="bold-text">{{ leave.LeaveBalance }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div style="margin-top: 60px;display: flex;">
+            <div>
+                <gb-newpicklist (PicklistValue)="OnPicklistChange($event)" [FormData]="form.value"
+                    formControlName="ReasonName" (PicklistValue)="ReasonNameFunction($event)">
+                </gb-newpicklist>
+                <div>
+                    <gb-textarea formControlName="TLeaveRemarks"
+                        (TextAreaFocusOutput)="TLeaveRemarksEvent($event)"></gb-textarea>
+
+                </div>
+            </div>
+
+            <div>
+                <div class="FormTabSection">
+                    <div class="custom-formgrid-container">
+                        <gb-formgrid [FormData]="form.value" formControlName="TLeaveDetailArray"
+                            [GridRefresh]="GridRefresh()" (GridFocusOutput)="TLeaveDetailGridOutput($event)"
+                            (leaveSessionChanged)="onLeaveSessionChanged($event)" [toggleStateData]="toggleStateData">
+                        </gb-formgrid>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</form>
