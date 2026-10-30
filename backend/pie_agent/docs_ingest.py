@@ -88,8 +88,13 @@ def passages(sections: list[tuple[str, str]], size: int = CHUNK_CHARS) -> list[t
 
 
 def _known_modules() -> list[str]:
+    """Module folder names: the modules built in outputs/modules plus every module the code defines a
+    taxonomy or display name for, so a fresh clone (no outputs/) still tags data/docs/<module>/ files."""
+    from .usage import MODULE_NAMES, MODULE_TAXONOMY
     root = from_root("outputs/modules")
-    return sorted(p.name for p in root.iterdir() if p.is_dir()) if root.exists() else []
+    built = {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
+    defined = {m for m in (*MODULE_TAXONOMY, *MODULE_NAMES) if re.fullmatch(r"[a-z0-9][a-z0-9-]*", m)}
+    return sorted(built | defined)
 
 
 def guess_module(rel: str, text: str, modules: list[str]) -> str:

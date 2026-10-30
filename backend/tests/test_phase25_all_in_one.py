@@ -190,6 +190,43 @@ def test_documents_are_read_split_and_tagged(tmp_path):
     assert r["passages"] == len(q.points)                                # re-ingest replaces, never duplicates
 
 
+@pytest.fixture
+def no_built_modules(tmp_path, monkeypatch):
+    """A fresh clone or CI runner: outputs/ (gitignored) does not exist, so no module has been built."""
+    from pathlib import Path
+    from pie_agent import docs_ingest
+    empty_root = tmp_path / "fresh-clone"
+    monkeypatch.setattr(docs_ingest, "from_root", lambda p: Path(p) if Path(p).is_absolute() else empty_root / p)
+
+
+def test_known_modules_do_not_depend_on_built_outputs(no_built_modules):
+    from pie_agent.docs_ingest import _known_modules
+    known = _known_modules()
+    assert {"inventory", "ess", "hrms", "gb-ent-client"} <= set(known)
+    assert all(" " not in m for m in known)                              # only names usable as folder names
+
+
+def test_documents_are_tagged_by_module_folder_without_built_outputs(tmp_path, no_built_modules):
+    docs = tmp_path / "docs"
+    (docs / "inventory" / "manuals").mkdir(parents=True)
+    _docx(docs / "inventory" / "manuals" / "Item Manual.docx", [(True, "Creating an item"), (False, "Enter the Item Code. " * 90)])
+    (docs / "inventory" / "notes.md").write_text("# Gate entry\n\n" + "Record vehicle arrival at the gate. " * 60, encoding="utf-8")
+    (docs / "ess").mkdir()
+    (docs / "ess" / "leave.txt").write_text("Apply for leave and track approval. " * 60, encoding="utf-8")
+    (docs / "general.txt").write_text("Company holidays and office timings. " * 60, encoding="utf-8")
+    q = FakeHybridQdrant()
+    r = ingest_documents(QdrantKMS(q, "kb", hybrid()), [str(docs)], progress=lambda m: None)
+    by_file = {f["file"]: f["module"] for f in r["files"]}
+    assert by_file == {"inventory/manuals/Item Manual.docx": "inventory", "inventory/notes.md": "inventory",
+                       "ess/leave.txt": "ess", "general.txt": ""}           # untagged stays untagged, no default module
+    for p in q.points.values():                                           # every passage carries its document's module
+        assert p["payload"]["module"] == by_file[p["payload"]["source_file"]]
+    # An explicit module still overrides the folder.
+    q2 = FakeHybridQdrant()
+    ingest_documents(QdrantKMS(q2, "kb", hybrid()), [str(docs / "ess")], module="hrms", progress=lambda m: None)
+    assert {p["payload"]["module"] for p in q2.points.values()} == {"hrms"}
+
+
 # ---------------------------------------------------------------- business knowledge
 
 DRAFT = {"overview": "Bills of materials define the components of each product.", "users": ["Production planner"],
