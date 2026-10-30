@@ -1,16 +1,15 @@
-# Test -> build the two Docker images -> push them to Docker Hub.
-# Runs on every push to main, or by hand (Actions -> Run workflow).
+# Test -> build the backend Docker image -> push it to Docker Hub.
+# Runs on every push to main, or manually from Actions -> Run workflow.
 #
-# Repository settings -> Secrets and variables -> Actions -> New repository secret:
-#   DOCKERHUB_USERNAME   your Docker Hub user name
-#   DOCKERHUB_TOKEN      a Docker Hub access token (Docker Hub -> Account settings -> Personal access tokens,
-#                        permission "Read & Write"); not your password
+# Configure these GitHub repository secrets:
+#   DOCKER_USERNAME   your Docker Hub username
+#   DOCKER_PASSWORD   your Docker Hub password or access token
 #
-# Images:  <DOCKERHUB_USERNAME>/pie-backend   (API, port 8080)
-#          <DOCKERHUB_USERNAME>/pie-frontend  (nginx + web pages, port 80)
-# Tags:    latest  and  the commit's short SHA (e.g. 85cc300), so any version can be rolled back to.
+# Image:
+#   <DOCKER_USERNAME>/pie-backend
+# Tags: latest and the commit's short SHA.
 
-name: Build and push to Docker Hub
+name: Build and push PIE backend to Docker Hub
 
 on:
   push:
@@ -29,9 +28,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
@@ -46,32 +47,31 @@ jobs:
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image: [backend, frontend]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
       - name: Short commit id
         id: vars
         run: echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSOWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push pie-${{ matrix.image }}
+      - name: Build and push PIE backend
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/${{ matrix.image }}.Dockerfile
+          file: docker/backend.Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/pie-${{ matrix.image }}:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/pie-${{ matrix.image }}:${{ steps.vars.outputs.sha }}
-          cache-from: type=gha,scope=${{ matrix.image }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+            ${{ secrets.DOCKER_USERNAME }}/pie-backend:latest
+            ${{ secrets.DOCKER_USERNAME }}/pie-backend:${{ steps.vars.outputs.sha }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
