@@ -24,10 +24,10 @@ RUN useradd --uid 1000 --create-home pie \
     && chown -R pie:pie /app
 USER pie
 
-EXPOSE 8000
+EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)"
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=4)"
 
 # One worker: chats and the activity log are SQLite files under outputs/.
-CMD ["uvicorn", "pie_agent.api:app", "--app-dir", "backend", "--host", "0.0.0.0", "--port", "8000", \
+CMD ["uvicorn", "pie_agent.api:app", "--app-dir", "backend", "--host", "0.0.0.0", "--port", "8080", \
      "--proxy-headers", "--forwarded-allow-ips", "*"]
